@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///./resources/C:/PROJECTS/landing-core/resources/app.scss"],"names":[],"mappings":"AAOA;EACI;CANJ","file":"/css/app.css","sourcesContent":["\n// Variables\n@import './sass/variables';\n\n// Normalize\n//@import 'normalize';\n\nbody {\n    font-size: 26px;\n}"],"sourceRoot":""}

@@ -17,9 +17,10 @@ class CreateProductsTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('description');
+            $table->string('article');
             $table->unsignedBigInteger('price');
             $table->unsignedInteger('sale')->default(0);
-            $table->unsignedTinyInteger('available')->default(1);
+            $table->integer('available')->default(-1);
             $table->timestamps();
         });
     }

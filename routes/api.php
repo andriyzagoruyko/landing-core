@@ -19,4 +19,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('products', ProductController::class);
+
+Route::prefix('admin')->group(function () {
+    Route::resource('products', ProductController::class)->except([
+        'create', 'edit'
+    ]);
+    
+    Route::post('products/deletes', [ProductController::class, 'deletes']);
+});
