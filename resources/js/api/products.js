@@ -1,20 +1,24 @@
 import axios from 'axios';
 
-const get = async () => {
-    const result = await axios.get('/api/admin/products');
+const get = async (params) => {
+    const result = await axios.get(`/api/admin/products?${params}`);
 
     return result.data;
 }
 
-const remove = (id) => {
+const remove = async (id) => {
+    let result;
+
     if (Array.isArray(id)) {
-        return axios.post('/api/admin/products/deletes', JSON.stringify(id));
+        result = await axios.post(`/api/admin/products/deletes`, JSON.stringify(id));
+    } else {
+        result = await axios.delete(`/api/admin/products/${id}`);
     }
 
-    return axios.delete(`/api/admin/products/${id}`);
+    return result.data;
 }
 
-const create = async ({...data}) => {
+const create = async ({ ...data }) => {
     if (!data.saleEnabled) {
         delete data.sale;
         delete data.saleExpires;

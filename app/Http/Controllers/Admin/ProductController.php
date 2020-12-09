@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Filters\ProductsFilter;
 use App\Http\Controllers\Controller;
+use Illuminate\Pagination\Paginator;
 use App\Http\Requests\ProductRequest;
 
 class ProductController extends Controller
@@ -14,9 +16,17 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(ProductsFilter $filter)
     {
-        return Product::orderBy('id', 'DESC')->get();
+        $limit = $filter->request->has('limit') ? $filter->request->limit : 10;
+        $query = Product::filter($filter);
+        $paginate = $query->orderBy('id', 'DESC')->paginate($limit);
+
+        if ($paginate->currentPage() > $paginate->lastPage() ) {
+            return response()->json('Not found', 404);
+        }
+        
+        return $paginate;
     }
 
     /**
@@ -64,10 +74,17 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product)
     {
         $product->delete();
-        
+
+        if ($request->has('page')) {
+            $limit = $request->has('limit') ? $request->limit : 10;
+            $paginate = Product::orderBy('id', 'DESC')->paginate($limit);
+            
+            return response()->json($paginate, 200);
+        }
+
         return response()->json(null, 204);
     }
 

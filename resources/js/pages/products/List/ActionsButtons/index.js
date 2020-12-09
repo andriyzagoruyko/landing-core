@@ -4,10 +4,14 @@ import { removeProducts } from '~s/actionCreators/products'
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-
 const ActionsButtons = ({ id, removeProducts }) => {
+
     const onClickEdit = () => {
         console.log('click Edit', id);
+    }
+
+    const onClickRemove = (id) => {
+        removeProducts([id]);
     }
 
     return (
@@ -17,27 +21,21 @@ const ActionsButtons = ({ id, removeProducts }) => {
             </span>
 
             <span style={{ cursor: 'pointer' }} role="button" aria-label="edit">
-                <DeleteIcon color="secondary" onClick={() => removeProducts(id)} />
+                <DeleteIcon color="secondary" onClick={() => onClickRemove(id)} />
             </span>
         </>
     );
 };
 
-const mapStateToProps = state => {
-    return {
-        products: state.products.products,
-    }
-}
-
 const mapDispatchToProps = dispatch => {
     return {
-        removeProducts: (id) => dispatch(removeProducts(id)),
+        removeProducts: (id) => dispatch(removeProducts(id))
     }
 }
 
 export default React.memo(
     connect(
-        mapStateToProps,
+        null,
         mapDispatchToProps)(ActionsButtons)
 )
 

@@ -1,67 +1,88 @@
+import React from 'react';
 import Page404 from '~p/errors/e404';
 import Home from '~p/home';
 import ProductList from '~p/products/list';
-import ProductForm from '~p/products/form';
+import ProductForm from '~p/products/Single/form';
+import HomeIcon from '@material-ui/icons/Home';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import { matchPath, generatePath } from "react-router-dom";
 
-const routes = [
-    {
+export const routes = {
+    home: {
         name: 'home',
-        title: 'Main page',
-        url: '/',
+        title: 'Dashboard',
+        path: '/',
         component: Home,
         exact: true
     },
-    {
+    products: {
         name: 'products',
-        title: 'Products',
-        url: '/products',
+        title: 'Products list',
+        path: '/products',
         component: ProductList,
         exact: true,
     },
-    {
+    productsAdd: {
         name: 'productsAdd',
         title: 'Add product',
-        url: '/add-product',
+        path: '/products/add',
         component: ProductForm,
         exact: true,
     },
-    {
+    productsEdit: {
+        name: 'productsEdit',
+        title: 'Edit product',
+        path: '/products/:id',
+        component: ProductForm,
+        exact: true,
+    },
+    notFound: {
+        name: 'notFound',
         title: 'Page not found',
-        url: '**',
+        path: '**',
         component: Page404
+    }
+}
+
+export const navList = [
+    {
+        label: 'Main page',
+        to: '/',
+        icon: <HomeIcon color="primary" />
+    },
+    {
+        label: 'Products',
+        icon: <ShoppingCartIcon color="primary" />,
+        submenu: [
+            {
+                label: 'List',
+                to: '/products',
+            },
+            {
+                label: 'Add product',
+                to: '/products/add'
+            }
+        ]
     }
 ];
 
-let routesMap = {};
+export const routesMatch = (routePath, url) => {
+    const match = matchPath(url, {
+        path: routePath,
+        exact: true
+    });
 
-routes.forEach(route => {
-    if (route.hasOwnProperty('name')) {
-        routesMap[route.name] = route.url;
-    }
-});
-
-const getRouteByParth = path => {
-    const result = routes.find(route => route.url === path);
-    if (result) {
-        return result;
-    }
-
-    return routes[routes.length - 1];
+    return (match != null && match.params) != false
 }
 
-const urlBuilder = (name, params) => {
-    if (!routesMap.hasOwnProperty(name)) {
+export const getRouteByUrl = url => Object.values(routes).find(route => routesMatch(route.path, url)) || {};
+
+export const urlBuilder = (name, params) => {
+    if (!routes.hasOwnProperty(name)) {
         return null;
     }
 
-    const url = routesMap[name];
-
-    for (let key in params) {
-        url = url.replace(':' + key, params[key]);
-    }
-
-    return url;
+    return generatePath(routes[name], params);
 }
 
 export default routes;
-export { routes, routesMap, getRouteByParth, urlBuilder };
