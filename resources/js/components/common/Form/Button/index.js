@@ -8,12 +8,12 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const FormButton = ({ label, ...rest }) => {
+const FormButton = ({ children, ...rest }) => {
     const classes = useStyles();
 
     return (
-        <Button variant="contained" color="primary" className={classes.submit} {...rest}>
-            {label}
+        <Button className={classes.submit} {...rest}>
+            {children}
         </Button>
     );
 }

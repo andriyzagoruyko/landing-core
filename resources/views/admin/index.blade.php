@@ -8,9 +8,6 @@
     <body>
         <div id="app"></div>
         <script src="{{ asset('js/main.js') }}"></script>
-        @if(config('app.env') == 'local')
-            <script src="http://localhost:35729/livereload.js"></script>
-        @endif
     </body>
 </html>
 

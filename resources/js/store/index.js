@@ -7,7 +7,9 @@ import { createBrowserHistory } from 'history'
 import { historyState } from './middlewares/historyState'
 import logger from 'redux-logger'
 
-export const history = createBrowserHistory()
+export const history = createBrowserHistory({
+    basename: '/admin/',
+})
 
 export default function configureStore() {
     const store = createStore(
@@ -17,7 +19,7 @@ export default function configureStore() {
                 routerMiddleware(history),
                 historyState(history),
                 thunk,
-               // logger
+                //logger
             )
         ),
     );

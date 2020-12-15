@@ -8,10 +8,11 @@ export const historyState = (history) => (store) => (next) => (action) => {
         if (action.payload.action === 'POP'
             && !action.payload.isFirstRendering
             && history.location.state) {
-            return next({
+            store.dispatch({
                 type: HISTORY_EXTRACT,
                 payload: { ...history.location.state }
             });
+            return next(action);
         }
     }
 

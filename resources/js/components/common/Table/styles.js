@@ -21,10 +21,7 @@ const useStyles = makeStyles(theme => ({
     searchButton: {
         padding: 10,
     },
-    container: {
-        padding: theme.spacing(5),
-        textAlign: 'center'
-    }
+
 }));
 
 export default useStyles;

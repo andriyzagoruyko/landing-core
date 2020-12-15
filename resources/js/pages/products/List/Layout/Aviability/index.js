@@ -4,11 +4,11 @@ import Chip from '@material-ui/core/Chip';
 
 const useStyles = makeStyles({
     aviability: {
-        minWidth: 100
+        minWidth: 100,
     }
 });
 
-const Aviability = ({ available }) => {
+const Aviability = ({ available, ...restProps }) => {
     const classes = useStyles();
     let color, label;
 
@@ -25,7 +25,7 @@ const Aviability = ({ available }) => {
         }
     }
 
-    return <Chip className={classes.aviability} color={color} label={label} variant="outlined" />;
+    return <Chip className={classes.aviability} color={color} label={label} variant="outlined" {...restProps} />;
 }
 
 export default Aviability;

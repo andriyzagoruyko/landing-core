@@ -2,7 +2,8 @@ import React from 'react';
 import Page404 from '~p/errors/e404';
 import Home from '~p/home';
 import ProductList from '~p/products/list';
-import ProductForm from '~p/products/Single/form';
+import AddProduct from '~p/products/Single/AddProduct';
+import EditProduct from '~p/products/Single/EditProduct';
 import HomeIcon from '@material-ui/icons/Home';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { matchPath, generatePath } from "react-router-dom";
@@ -17,7 +18,7 @@ export const routes = {
     },
     products: {
         name: 'products',
-        title: 'Products list',
+        title: 'Products',
         path: '/products',
         component: ProductList,
         exact: true,
@@ -26,14 +27,14 @@ export const routes = {
         name: 'productsAdd',
         title: 'Add product',
         path: '/products/add',
-        component: ProductForm,
+        component: AddProduct,
         exact: true,
     },
     productsEdit: {
         name: 'productsEdit',
         title: 'Edit product',
         path: '/products/:id',
-        component: ProductForm,
+        component: EditProduct,
         exact: true,
     },
     notFound: {
@@ -57,10 +58,6 @@ export const navList = [
             {
                 label: 'List',
                 to: '/products',
-            },
-            {
-                label: 'Add product',
-                to: '/products/add'
             }
         ]
     }
@@ -78,11 +75,9 @@ export const routesMatch = (routePath, url) => {
 export const getRouteByUrl = url => Object.values(routes).find(route => routesMatch(route.path, url)) || {};
 
 export const urlBuilder = (name, params) => {
-    if (!routes.hasOwnProperty(name)) {
-        return null;
-    }
-
-    return generatePath(routes[name], params);
+    return routes.hasOwnProperty(name)
+        ? generatePath(routes[name].path, params)
+        : null;
 }
 
 export default routes;

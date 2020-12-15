@@ -26,32 +26,22 @@ const CustomTable = (props) => {
 
     return (
         <TableContainer  >
-            {(!rows.length)
-                ? (
-                    <Container className={classes.container}>
-                        <Typography variant="subtitle1" component="span">
-                            {emptyText}
-                        </Typography>
-                    </Container>
-                )
-                : (
-                    <Table size='medium' className={classes.table} {...restProps}>
-                        <Head
-                            columns={columns}
-                            checkbox={checkbox}
-                            checked={selectedCount > 0}
-                            indeterminate={selectedCount > 0 && selectedCount < rows.length}
-                            onSelectAll={onSelectAll}
-                        />
-                        <Body
-                            columns={columns}
-                            rows={rows}
-                            emptyRows={perPage - Math.min(perPage, rows.length)}
-                            selectedRows={selectedRows}
-                            checkbox={checkbox}
-                            onSelect={onSelect} />
-                    </Table>
-                )}
+            <Table size='medium' className={classes.table} {...restProps}>
+                <Head
+                    columns={columns}
+                    checkbox={checkbox}
+                    checked={selectedCount > 0}
+                    indeterminate={selectedCount > 0 && selectedCount < rows.length}
+                    onSelectAll={onSelectAll}
+                />
+                <Body
+                    columns={columns}
+                    rows={rows}
+                    emptyRows={perPage - Math.min(perPage, rows.length)}
+                    selectedRows={selectedRows}
+                    checkbox={checkbox}
+                    onSelect={onSelect} />
+            </Table>
         </TableContainer>
     );
 }
@@ -67,7 +57,6 @@ CustomTable.propTypes = {
 
 CustomTable.defaultProps = {
     perPage: 0,
-    emptyText: "No results found.",
     onSelect: () => { },
 };
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import { IconButton, Tooltip, Menu, MenuItem, Checkbox, Badge } from '@material-ui/core/';
 import FilterListIcon from '@material-ui/icons/FilterList';
@@ -6,9 +7,7 @@ import filterCreator from './filterCreator';
 
 const useStyles = makeStyles(() => ({
     root: {
-        flex: '1 1 auto',
         display: 'flex',
-        justifyContent: 'flex-end'
     },
     filter: {
         display: 'flex',
@@ -132,5 +131,17 @@ const Filter = ({ show = true, filters, onChange, onSubmit }) => {
         </div>
     );
 }
+
+Filter.propTypes = {
+    show: PropTypes.bool,
+    filters: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+};
+
+Filter.defaultProps = {
+    onChange: () => { },
+    onSubmit: () => { },
+};
 
 export default Filter;

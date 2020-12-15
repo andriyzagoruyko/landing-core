@@ -18,11 +18,11 @@ class ProductController extends Controller
      */
     public function index(ProductsFilter $filter)
     {
-        $limit = $filter->request->has('limit') ? $filter->request->limit : 10;
+        $limit = $filter->request->has('limit') ? $filter->request->limit : 12;
         $query = Product::filter($filter);
         $paginate = $query->orderBy('id', 'DESC')->paginate($limit);
 
-        if ($paginate->currentPage() > $paginate->lastPage() ) {
+        if ($limit > 100 || $paginate->currentPage() > $paginate->lastPage()) {
             return response()->json('Not found', 404);
         }
         
@@ -38,9 +38,15 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         $product = Product::create($request->all());
-        $product = Product::find($product->id);
 
-        return response()->json($product, 201);
+        if ($request->hasFile('images')) {
+            $product->addMultipleMediaFromRequest(['images'])
+                ->each(function ($fileAdder) {
+                    $fileAdder->toMediaCollection('images');
+                });
+        }
+
+        return response()->json($product->fresh(), 201);
     }
 
     /**
@@ -63,9 +69,32 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product)
     {
+        $updateMedia = $request->has('updateMedia') ? $request->updateMedia : [];
         $product->update($request->all());
 
-        return response()->json($product, 200);
+        if ($request->hasFile('images')) {
+            $product->addMultipleMediaFromRequest(['images'])
+                ->each(function ($fileAdder) use (&$updateMedia){
+                    $image = $fileAdder->toMediaCollection('images');
+                    $index = array_search($image->file_name, $updateMedia);
+                    $updateMedia[$index] = $image->id;
+                });
+        }
+
+        $product->getMedia('images')->each(function($media) use (&$updateMedia){
+            if (!in_array($media->id, $updateMedia)) {
+                try {
+                    $media->delete();
+                }catch(NotReadableException $e){ }
+            }
+
+            if (!empty($updateMedia)) {
+                $index = array_search($media->id, $updateMedia);
+                $media->setNewOrder($updateMedia);
+            }
+        });
+
+        return response()->json($product->fresh(), 200);
     }
 
     /**

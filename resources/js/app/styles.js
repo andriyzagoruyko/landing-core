@@ -13,6 +13,7 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
+        overflow: 'hidden',
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(2),

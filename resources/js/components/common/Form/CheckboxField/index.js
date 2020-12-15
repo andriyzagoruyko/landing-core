@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FormControlLabel, FormGroup, Checkbox } from '@material-ui/core/';
 import { makeStyles } from '@material-ui/core/styles';
-import { makeFields } from '../fieldCreator';
 import { Field } from 'redux-form'
 
 const useStyles = makeStyles((theme) => ({
@@ -29,20 +28,20 @@ const renderCheckbox = ({ input, label, meta, onChange, ...rest }) => {
     )
 }
 
-const FormCheckboxField = ({ lable, name, fields }) => {
+const FormCheckboxField = ({ label, name, children }) => {
     const [enabled, setEnabled] = useState(false);
 
     return (
         <>
             <Field
-                label={lable}
+                label={label}
                 name={name}
                 component={renderCheckbox}
                 onChange={() => setEnabled(!enabled)}
             />
 
             <FormGroup row >
-                {enabled && makeFields(fields)}
+                {enabled && children}
             </FormGroup>
         </>
 

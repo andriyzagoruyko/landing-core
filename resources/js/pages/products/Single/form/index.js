@@ -1,69 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { reduxForm, initialize } from 'redux-form'
-import { connect } from 'react-redux';
-import { createProduct } from '~s/actionCreators/products'
-import validate from './validation'
-import Form from '~c/common/Form/'
-import formStructure from './formStructure'
-import { useHistory } from "react-router-dom";
-import { urlBuilder } from "~/routes";
-import { toNumber } from 'lodash';
-import { fetchProducts } from '~s/actionCreators/products'
+import { reduxForm } from 'redux-form';
+import validate from './validation';
+import Form from '~c/common/Form/';
+import Section from '~c/common/Form/Section';
+import Field from '~c/common/Form/Field';
+import CheckboxField from '~c/common/Form/CheckboxField';
+import Upload from '~c/common/Form/Upload';
+import Button from '~c/common/Form/Button';
 
-
-const ProductForm = ({ handleSubmit, createProduct, products, fetchProducts, initializeForm, ...props }) => {
-    const history = useHistory();
-    let isEdit = false;
-    const id = toNumber(props.match.params.id);
-
-    const [product, setProduct] = useState();
-
-    useEffect(() => {
-        if (id && !products.length) {
-            fetchProducts();
-        }
-    }, []);
-
-    if (id) {
-        if (products.length) {
-            const index = products.findIndex(item => item.id == id);
-            console.log(index);
-
-            if (index != -1) {
-                initializeForm(products[index]);
-            }
-        }
-    }
-
- 
-
-
-    const submit = async (data) => {
-        await createProduct(data);
-        history.push(urlBuilder('products'));
-    }
-
+const ProductForm = ({ isEdit, onSubmit, handleSubmit }) => {
     return (
-        <Form
-            formStructure={formStructure}
-            onSubmit={handleSubmit(submit)}
-        />
+        <Form onSubmit={handleSubmit(onSubmit)} >
+            <Section title="General" divider>
+                <Field name="title" label="Product name" />
+                <Field name="article" label="Product article" />
+            </Section>
+
+            <Section title="Selling" divider>
+                <Field name="price" label="Product price" type="number" grow={false} />
+                <Field name="available" label="Availability (optional)" type="number" grow={false} />
+                <CheckboxField name="saleEnabled" label="With sale" type="number" grow={false} >
+                    <Field name="sale" label="Sale in %" type="number" />
+                    <Field name="saleExpires" label="Sale expires at (optional)" type="datetime-local" InputLabelProps={{ shrink: true }} />
+                </CheckboxField >
+            </Section>
+
+            <Section title="Images" divider>
+                <Upload
+                    name="images"
+                    filesLimit={5}
+                    acceptedFiles={['image/*']}
+                    dropzoneText={"Drag and drop an image here or click"}
+                />
+            </Section>
+
+            <Section title="Description">
+                <Field name="description" label="Product description" multiline fullWidth rows={8} />
+            </Section>
+
+            <Section >
+                <Button variant="contained" color="primary" type="submit">
+                    {isEdit ? "Save product" : "Add product"}
+                </Button>
+            </Section>
+        </Form>
     );
 }
 
-const mapStateToProps = state => {
-    return {
-        products: state.products.products,
-    }
-}
-
-const mapDispatchToProps = dispatch => {
-    return {
-        fetchProducts: () => dispatch(fetchProducts()),
-        createProduct: (data) => dispatch(createProduct(data)),
-        initializeForm: (product) => dispatch(initialize('ProductForm', product))
-    }
-}
-
-const Connected = connect(mapStateToProps, mapDispatchToProps)(ProductForm);
-export default reduxForm({ form: 'ProductForm', validate, })(Connected)
+export default reduxForm({
+    form: 'ProductForm',
+    enableReinitialize: true,
+    validate
+})(ProductForm);

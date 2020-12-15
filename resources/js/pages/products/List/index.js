@@ -1,37 +1,38 @@
 import React, { useLayoutEffect } from 'react';
 import { connect } from 'react-redux'
+
 import {
     removeProducts,
     changePage, selectProducts,
     initializeProducts,
     makeSearch,
+    submitFilters,
     setProductsSearch,
     setProductsFilters,
-    submitFilters,
+    setProductsViewType,
 } from '~s/actionCreators/products'
-import { urlBuilder } from '~/routes';
+import { filterStructure, perPageOptions } from './constants'
+import queryStringConfig from '~/constants/queryStringConfig'
 import { Container, Paper } from '@material-ui/core';
-import Link from '~c/common/Link'
-import Table from '~c/common/Table'
-import Toolbar from '~c/common/Table/Toolbar/';
-import { Filter, initializeFilter } from '~c/common/Filter';
-import Search from '~c/common/Search/';
 import Pagination from '~c/common/Pagination/';
 import Page404 from '~p/errors/e404';
-import { tableStructure, filterStructure, perPageOptions } from './constants'
-import queryStringConfig from '~/constants/queryStringConfig'
+import Toolbar from './Toolbar/';
+import ProductsLayout from './Layout'
 
 const queryString = require('query-string');
 
 const ProductsList = (props) => {
     const {
+        viewType,
         isLoading,
         isError,
         isInitialized,
+        lastQueryParams,
+        total,
         maxPages,
         items,
         selected,
-        search,
+        searchKeyword,
         filters,
         history,
         initializeProducts,
@@ -40,105 +41,93 @@ const ProductsList = (props) => {
         setProductsSearch,
         changePage,
         makeSearch,
+        submitFilters,
         setProductsFilters,
-        submitFilters
+        setProductsViewType,
     } = props;
 
-    const {
-        page: queryPage = 1,
-        limit: queryLimit = perPageOptions[0],
-        search: querySearch = '',
-        ...filterQuery
-    } = queryString.parse(history.location.search, queryStringConfig);
-
     const selectedCount = Object.values(selected).filter(value => value).length;
+    const queryParams = history.location.search;
+    const { page = 1, limit = perPageOptions[0], search = '', ...filterParams
+    } = queryString.parse(queryParams, queryStringConfig);
 
     useLayoutEffect(() => {
-        if (history.action != 'REPLACE' && !isInitialized) {
-            setProductsSearch(querySearch);
-            setProductsFilters(initializeFilter(filterStructure, filterQuery));
-            initializeProducts(history.location.search);
+        const { action } = history;
+
+        if ((!isInitialized && action != 'REPLACE') || action === 'PUSH') {
+            initializeProducts(queryParams, search, filterParams, filterStructure);
         }
     }, [history.location]);
 
-    if (isError) {
+    if (isError || !perPageOptions.includes(limit)) {
         return <Page404 />
     }
+    const handleChangeViewType = (viewType) => setProductsViewType(viewType);
 
-    const handleChangePage = (e, newPage) => changePage(newPage, queryLimit);
+    const handleChangePage = (e, newPage) => changePage(newPage, limit);
     const handleChangePerPage = value => changePage(1, parseInt(value, 10));
 
-    const handleSelect = ids => selectProducts(ids);
     const handleRemoveSelected = () => removeProducts(items.filter(i => selected[i.id]).map(i => i.id));
 
     const handleChangeSearch = (search) => setProductsSearch(search);
     const handleSearch = () => makeSearch();
 
     const handleChangeFilter = filters => setProductsFilters(filters);
-    const handleSubmitFilter = filters => {
-        setProductsFilters(filters)
-        submitFilters();
-    };
-
-    const noProducts = querySearch.length
-        ? 'No results found.'
-        : (
-            <>
-                No products has been added.&nbsp;
-                <Link to={urlBuilder('productsAdd')}>Click to add</Link>
-            </>
-        );
+    const handleSubmitFilter = filters => submitFilters(filters);
 
     return (
         <>
-            <Container component={Paper} style={{ padding: 0 }} maxWidth={false}>
+            <Container component={Paper} style={{ padding: 0 }} maxWidth={false} >
                 <Toolbar
                     selectedCount={selectedCount}
                     onRemove={handleRemoveSelected}
-                >
-                    <Search
-                        show
-                        value={search}
-                        active={querySearch.length > 0}
-                        placeholder="Search by name and article"
-                        onChange={handleChangeSearch}
-                        onSearch={handleSearch}
-                    />
-                    <Filter
-                        show
-                        filterStructure={filterStructure}
-                        filters={filters}
-                        onChange={(filters) => handleChangeFilter(filters)}
-                        onSubmit={handleSubmitFilter}
-                    />
-                </Toolbar>
-                <Table
-                    columns={tableStructure}
-                    rows={items}
-                    perPage={queryLimit}
-                    checkbox
-                    selectedRows={selected}
+                    onReset={() => selectProducts()}
+                    total={total}
+                    page={page}
+                    maxPages={maxPages}
+                    view={viewType}
+                    onChangeView={(viewType) => handleChangeViewType(viewType)}
+                    searchProps={{
+                        value: searchKeyword,
+                        active: search.length > 0,
+                        onChange: handleChangeSearch,
+                        onSearch: handleSearch,
+                    }}
+                    filterProps={{
+                        filters,
+                        onChange: (filters) => handleChangeFilter(filters),
+                        onSubmit: handleSubmitFilter
+                    }}
+                />
+
+                <ProductsLayout
+                    view={viewType}
+                    items={items}
+                    perPage={limit}
+                    selectedItems={selected}
                     selectedCount={selectedCount}
-                    onSelect={handleSelect}
-                    onSelectAll={() => handleSelect(null)}
-                    emptyText={isLoading ? 'Loading...' : noProducts}
+                    onSelect={selectProducts}
+                    onSelectAll={selectProducts}
+                    searchActive={search.length > 0}
+                    isLoading={isLoading}
                     aria-label="products table"
                 />
             </Container>
-
-            {(items.length > 0) && (
-                <Pagination
-                    maxPages={maxPages}
-                    siblingCount={1}
-                    page={queryPage}
-                    perPage={queryLimit}
-                    perPageOptions={perPageOptions}
-                    routeName={'products'}
-                    variant="outlined"
-                    onChangePage={handleChangePage}
-                    onChangePerPage={(e) => handleChangePerPage(e.target.value)}
-                />
-            )}
+            {
+                (items.length > 0) && (
+                    <Pagination
+                        maxPages={maxPages}
+                        siblingCount={1}
+                        page={page}
+                        perPage={limit}
+                        perPageOptions={perPageOptions}
+                        routeName={'products'}
+                        variant="outlined"
+                        onChangePage={handleChangePage}
+                        onChangePerPage={(e) => handleChangePerPage(e.target.value)}
+                    />
+                )
+            }
         </>
     )
 }
@@ -146,27 +135,19 @@ const ProductsList = (props) => {
 const mapStateToProps = state => {
     return {
         isLoading: state.app.isLoading,
+        viewType: state.products.viewType,
         isInitialized: state.products.isInitialized,
         isError: state.products.isError,
+        total: state.products.total,
+        lastQueryParams: state.products.lastQueryParams,
         items: state.products.items,
         maxPages: state.products.maxPages,
         selected: state.products.selected,
-        search: state.products.search,
+        searchKeyword: state.products.searchKeyword,
         filters: state.products.filters
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        initializeProducts: (params) => dispatch(initializeProducts(params)),
-        removeProducts: (ids) => dispatch(removeProducts(ids)),
-        selectProducts: (ids) => dispatch(selectProducts(ids)),
-        changePage: (page, perPage) => dispatch(changePage(page, perPage)),
-        makeSearch: () => dispatch(makeSearch()),
-        submitFilters: () => dispatch(submitFilters()),
-        setProductsSearch: (search) => dispatch(setProductsSearch(search)),
-        setProductsFilters: (filters) => dispatch(setProductsFilters(filters)),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ProductsList);
+export default connect(mapStateToProps, {
+    initializeProducts, removeProducts, selectProducts, changePage, makeSearch, submitFilters, setProductsSearch, setProductsFilters, setProductsViewType
+})(ProductsList);

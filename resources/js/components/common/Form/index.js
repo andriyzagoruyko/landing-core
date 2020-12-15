@@ -1,9 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Paper, FormGroup, Typography } from '@material-ui/core/';
-import Divider from '@material-ui/core/Divider';
+import { Paper } from '@material-ui/core/';
 import { makeStyles } from '@material-ui/core/styles';
-import { makeFields } from './fieldCreator';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -42,37 +39,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const Form = ({ formStructure, ...rest }) => {
+const Form = ({ children, ...rest }) => {
     const classes = useStyles();
-
-    const sections = formStructure.map(({ title = '', divider = true, fields }, index) => {
-        return (
-            <React.Fragment key={index}>
-                <FormGroup row className={classes.formGroup}>
-                    {title && (
-                        <Typography variant="h6" className={classes.title}>{title}</Typography>
-                    )}
-                    <div className={classes.sectionBody}>
-                        {makeFields(fields)}
-                    </div>
-                </FormGroup>
-
-                {divider && (
-                    <Divider className={classes.divider} />
-                )}
-            </React.Fragment>
-        )
-    })
 
     return (
         <Paper component="form" className={classes.paper} {...rest}>
-            {sections}
+            {children}
         </Paper>
     )
 }
 
-Form.propTypes = {
-    formStructure: PropTypes.array.isRequired,
-};
 
 export default Form;

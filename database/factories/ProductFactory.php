@@ -29,4 +29,18 @@ class ProductFactory extends Factory
             'available' => $this->faker->randomNumber(2)
         ];
     }
+
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
+    public function configure()
+    {
+        return $this->afterCreating(function (Product $product) {
+            $path = 'public/storage/';
+            $image = $this->faker->image($path, 900, 500, null, false);
+            $product->addMedia($path.$image)->toMediaCollection('images');
+        });
+    }
 }

@@ -1,7 +1,7 @@
 
 import React from 'react';
-import Aviability from './Aviability/index.js'
-import ActionsButtons from './ActionsButtons'
+import Aviability from './Layout/Aviability'
+import ActionsButtons from './Layout/ActionsButtons'
 
 export const tableStructure = [
     {
@@ -61,5 +61,4 @@ export const filterStructure = [
     }
 ]
 
-
-export const perPageOptions = [10, 30, 50, 100];
+export const perPageOptions = [12, 36, 60];

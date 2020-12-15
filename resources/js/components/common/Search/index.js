@@ -11,6 +11,7 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         alignItems: 'center',
         width: 400,
+        maxWidth: '100%'
     },
     searchInput: {
         marginLeft: theme.spacing(1),
@@ -21,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const Search = ({ show, value, placeholder, active, onChange, onSearch, ...rest }) => {
+const Search = ({ show = true, value, placeholder, active, onChange, onSearch, ...rest }) => {
     if (!show) {
         return null;
     }
@@ -35,7 +36,6 @@ const Search = ({ show, value, placeholder, active, onChange, onSearch, ...rest 
 
     const handleClicReset = () => {
         onChange('');
-
         if (active) {
             onSearch();
         }
@@ -78,6 +78,7 @@ const Search = ({ show, value, placeholder, active, onChange, onSearch, ...rest 
 Search.propTypes = {
     value: PropTypes.string,
     placeholder: PropTypes.string,
+    active: PropTypes.bool,
     onChange: PropTypes.func,
     onSearch: PropTypes.func,
 };
