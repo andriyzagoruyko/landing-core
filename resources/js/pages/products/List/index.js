@@ -1,31 +1,29 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux'
-
 import {
     removeProducts,
     changePage, selectProducts,
     initializeProducts,
-    makeSearch,
+    submitSearch,
     submitFilters,
     setProductsSearch,
     setProductsFilters,
     setProductsViewType,
 } from '~s/actionCreators/products'
-import { filterStructure, perPageOptions } from './constants'
-import queryStringConfig from '~/constants/queryStringConfig'
+import { filterStructure, tableStructure, perPageOptions } from './constants'
+import { parseQuery } from '~/helpers/query'
 import { Container, Paper } from '@material-ui/core';
+import WithTitle from "~/hocs/WithTitle"
 import Pagination from '~c/common/Pagination/';
 import Page404 from '~p/errors/e404';
 import Toolbar from './Toolbar/';
 import ProductsLayout from './Layout'
 
-const queryString = require('query-string');
-
 const ProductsList = (props) => {
     const {
         viewType,
-        isLoading,
         isError,
+        isFetching,
         isInitialized,
         lastQueryParams,
         total,
@@ -38,24 +36,27 @@ const ProductsList = (props) => {
         initializeProducts,
         removeProducts,
         selectProducts,
-        setProductsSearch,
         changePage,
-        makeSearch,
+        submitSearch,
         submitFilters,
+        setProductsSearch,
         setProductsFilters,
         setProductsViewType,
     } = props;
 
     const selectedCount = Object.values(selected).filter(value => value).length;
-    const queryParams = history.location.search;
-    const { page = 1, limit = perPageOptions[0], search = '', ...filterParams
-    } = queryString.parse(queryParams, queryStringConfig);
+    const locationSearch = history.location.search || lastQueryParams;
+    const {
+        page = 1,
+        limit = perPageOptions[0],
+        search = '',
+        ...filterParams
+    } = parseQuery(locationSearch);
+    const isSearchActive = search.length > 0;
 
-    useLayoutEffect(() => {
-        const { action } = history;
-
-        if ((!isInitialized && action != 'REPLACE') || action === 'PUSH') {
-            initializeProducts(queryParams, search, filterParams, filterStructure);
+    useEffect(() => {
+        if (history.action === 'PUSH' || (!isInitialized && history.action === 'POP')) {
+            initializeProducts(locationSearch, search, filterParams, filterStructure);
         }
     }, [history.location]);
 
@@ -70,7 +71,7 @@ const ProductsList = (props) => {
     const handleRemoveSelected = () => removeProducts(items.filter(i => selected[i.id]).map(i => i.id));
 
     const handleChangeSearch = (search) => setProductsSearch(search);
-    const handleSearch = () => makeSearch();
+    const handleSearch = () => submitSearch();
 
     const handleChangeFilter = filters => setProductsFilters(filters);
     const handleSubmitFilter = filters => submitFilters(filters);
@@ -89,7 +90,7 @@ const ProductsList = (props) => {
                     onChangeView={(viewType) => handleChangeViewType(viewType)}
                     searchProps={{
                         value: searchKeyword,
-                        active: search.length > 0,
+                        active: isSearchActive,
                         onChange: handleChangeSearch,
                         onSearch: handleSearch,
                     }}
@@ -103,41 +104,38 @@ const ProductsList = (props) => {
                 <ProductsLayout
                     view={viewType}
                     items={items}
-                    perPage={limit}
+                    columns={tableStructure}
                     selectedItems={selected}
                     selectedCount={selectedCount}
                     onSelect={selectProducts}
                     onSelectAll={selectProducts}
-                    searchActive={search.length > 0}
-                    isLoading={isLoading}
-                    aria-label="products table"
+                    searchActive={isSearchActive}
+                    isLoading={isFetching}
                 />
             </Container>
-            {
-                (items.length > 0) && (
-                    <Pagination
-                        maxPages={maxPages}
-                        siblingCount={1}
-                        page={page}
-                        perPage={limit}
-                        perPageOptions={perPageOptions}
-                        routeName={'products'}
-                        variant="outlined"
-                        onChangePage={handleChangePage}
-                        onChangePerPage={(e) => handleChangePerPage(e.target.value)}
-                    />
-                )
-            }
+            {(items.length > 0) && (
+                <Pagination
+                    disabled={isFetching}
+                    maxPages={maxPages}
+                    siblingCount={1}
+                    page={page}
+                    perPage={limit}
+                    perPageOptions={perPageOptions}
+                    variant="outlined"
+                    onChangePage={handleChangePage}
+                    onChangePerPage={(e) => handleChangePerPage(e.target.value)}
+                />
+            )}
         </>
     )
 }
 
 const mapStateToProps = state => {
     return {
-        isLoading: state.app.isLoading,
         viewType: state.products.viewType,
         isInitialized: state.products.isInitialized,
         isError: state.products.isError,
+        isFetching: state.products.isFetching,
         total: state.products.total,
         lastQueryParams: state.products.lastQueryParams,
         items: state.products.items,
@@ -148,6 +146,10 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, {
-    initializeProducts, removeProducts, selectProducts, changePage, makeSearch, submitFilters, setProductsSearch, setProductsFilters, setProductsViewType
+const ConnectedProductsList = connect(mapStateToProps, {
+    initializeProducts, removeProducts, selectProducts, 
+    changePage, submitSearch, submitFilters, 
+    setProductsSearch, setProductsFilters, setProductsViewType
 })(ProductsList);
+
+export default WithTitle(ConnectedProductsList);

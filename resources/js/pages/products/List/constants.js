@@ -28,7 +28,7 @@ export const tableStructure = [
         name: 'available',
         label: 'Availability',
         disablePadding: false,
-        component: (product) => <Aviability available={product.available} />,
+        component: (product) => <Aviability variant="outlined" available={product.available} />,
         filterType: 'range'
     },
     {

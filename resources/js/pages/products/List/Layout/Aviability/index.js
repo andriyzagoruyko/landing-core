@@ -25,7 +25,7 @@ const Aviability = ({ available, ...restProps }) => {
         }
     }
 
-    return <Chip className={classes.aviability} color={color} label={label} variant="outlined" {...restProps} />;
+    return <Chip className={classes.aviability} color={color} label={label}  {...restProps} />;
 }
 
 export default Aviability;

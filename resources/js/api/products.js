@@ -12,7 +12,6 @@ const get = async (id) => {
     return result.data;
 }
 
-
 const remove = async (id) => {
     let result;
 
@@ -26,14 +25,13 @@ const remove = async (id) => {
 }
 
 const create = async (data) => {
-    if (!data.saleEnabled) {
-        delete data.sale;
-        delete data.saleExpires;
-    }
-
     let ProductFormData = new FormData();
 
     for (let item in data) {
+        if (typeof data[item] === 'boolean' && !data[item]) {
+            continue;
+        }
+
         if (item === 'images') {
             data[item] && data[item].forEach(image => ProductFormData.append('images[]', image.file));
         } else {
@@ -52,11 +50,15 @@ const update = async (id, data) => {
     ProductFormData.append('_method', 'PATCH');
 
     for (let item in data) {
+        if (typeof data[item] === 'boolean' && !data[item]) {
+            continue;
+        }
+
         if (item === 'images') {
             data[item] && data[item].forEach(({ id, file }) => {
                 if (id) {
                     ProductFormData.append('updateMedia[]', id);
-                } else  {
+                } else {
                     ProductFormData.append('images[]', file);
                     ProductFormData.append('updateMedia[]', file.name);
                 }

@@ -1,17 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { urlBuilder } from '~/routes';
-import { tableStructure } from '../constants'
 import Table from '~c/common/Table'
-import Link from '~c/common/Link'
 import ProductsGrid from './Grid'
 import EmptyText from './EmptyText'
 
 const Products = (props) => {
     const {
         view,
+        columns,
         items,
-        perPage,
         selectedItems,
         selectedCount,
         onSelect,
@@ -39,9 +36,8 @@ const Products = (props) => {
                 <Table
                     checkbox
                     aria-label="products table"
-                    columns={tableStructure}
+                    columns={columns}
                     rows={items}
-                    perPage={perPage}
                     selectedRows={selectedItems}
                     selectedCount={selectedCount}
                     onSelect={onSelect}
@@ -61,7 +57,7 @@ const Products = (props) => {
 Products.propTypes = {
     view: PropTypes.string.isRequired,
     items: PropTypes.array.isRequired,
-    perPage: PropTypes.number.isRequired,
+    columns: PropTypes.array.isRequired,
     selectedItems: PropTypes.object.isRequired,
     selectedCount: PropTypes.number.isRequired,
     searchActive: PropTypes.bool,

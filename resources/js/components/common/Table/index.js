@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import useStyles from './styles'
 import { Table, TableContainer } from '@material-ui/core';
-import { Container, Typography } from '@material-ui/core';
-
 import Head from './Head';
 import Body from './Body';
 
@@ -12,7 +10,6 @@ const CustomTable = (props) => {
     const {
         columns,
         rows,
-        perPage,
         checkbox,
         emptyText,
         selectedRows,
@@ -37,7 +34,6 @@ const CustomTable = (props) => {
                 <Body
                     columns={columns}
                     rows={rows}
-                    emptyRows={perPage - Math.min(perPage, rows.length)}
                     selectedRows={selectedRows}
                     checkbox={checkbox}
                     onSelect={onSelect} />
@@ -50,13 +46,11 @@ CustomTable.propTypes = {
     title: PropTypes.string,
     columns: PropTypes.array.isRequired,
     rows: PropTypes.array.isRequired,
-    perPage: PropTypes.number,
     checkbox: PropTypes.bool,
     onCheck: PropTypes.func,
 };
 
 CustomTable.defaultProps = {
-    perPage: 0,
     onSelect: () => { },
 };
 

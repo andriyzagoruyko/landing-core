@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, Typography } from '@material-ui/core';
 
@@ -9,7 +8,6 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'center'
     }
 }));
-
 
 const EmptyText = ({ children }) => {
     const classes = useStyles();
@@ -22,8 +20,6 @@ const EmptyText = ({ children }) => {
         </Container>
     )
 };
-
-
 
 export default EmptyText;
 

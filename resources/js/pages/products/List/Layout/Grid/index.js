@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, Typography, Grid } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import ProductCard from '../Card'
 
 const useStyles = makeStyles(theme => ({
@@ -10,7 +10,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ProductsGrid = ({ items, selectedItems, onSelect, emptyText }) => {
+const ProductsGrid = ({ items, selectedItems, onSelect }) => {
     const classes = useStyles();
 
     return (
@@ -30,7 +30,6 @@ const ProductsGrid = ({ items, selectedItems, onSelect, emptyText }) => {
 ProductsGrid.propTypes = {
     items: PropTypes.array.isRequired,
     selectedItems: PropTypes.object,
-    emptyText: PropTypes.node,
     onSelect: PropTypes.func,
 };
 

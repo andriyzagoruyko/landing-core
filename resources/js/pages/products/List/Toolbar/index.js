@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import useStyles from './styles'
 import clsx from 'clsx'
-import { Toolbar, Tooltip, IconButton, Button, Typography, Box } from '@material-ui/core';
+import { Toolbar, Tooltip, IconButton, Typography, Box} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import UndoIcon from '@material-ui/icons/Undo';
 import ViewListIcon from '@material-ui/icons/ViewList';
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
-import AddIcon from '@material-ui/icons/Add';
+import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
 import Search from '~c/common/Search/';
 import { Filter } from '~c/common/Filter';
 import { Link } from 'react-router-dom';
@@ -29,7 +29,7 @@ const CustomTableToolbar = (props) => {
     const classes = useStyles();
 
     return (
-        <Toolbar
+        <Toolbar position="static"
             className={clsx(classes.toolbar, {
                 [classes.highlight]: selectedCount > 0,
             })}
@@ -44,13 +44,12 @@ const CustomTableToolbar = (props) => {
 
             {selectedCount > 0
                 ? (
-                    <div className={classes.tooltip}>
+                    <div className={classes.selectedButtons}>
                         <Tooltip title="Cancel">
                             <IconButton aria-label="cancel" onClick={onReset}>
                                 <UndoIcon />
                             </IconButton>
                         </Tooltip>
-
                         <Tooltip title="Delete" >
                             <IconButton aria-label="delete" onClick={onRemove}>
                                 <DeleteIcon />
@@ -65,16 +64,12 @@ const CustomTableToolbar = (props) => {
                         </Box>
 
                         <Box className={classes.section}>
-                            <Button
-                                className={classes.button}
-                                size="small"
-                                variant="contained"
-                                color="primary"
-                                component={Link}
-                                to={'/products/add'}
-                            >
-                                <AddIcon /> Add product
-                            </Button>
+                            <Tooltip title="Add product">
+                                <IconButton color="primary" component={Link} to={'/products/add'}>
+                                    <LibraryAddIcon />
+                                </IconButton>
+                            </Tooltip>
+
                             <Typography variant="body2" color="textSecondary" component="p">
                                 Quantity: {total}&nbsp; (page: {page}/{maxPages})
                             </Typography>

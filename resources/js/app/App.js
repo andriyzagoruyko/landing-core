@@ -12,14 +12,15 @@ import Loader from '~c/Preloader';
 const App = (props) => {
     const classes = useStyles();
 
-    const routesComponents = Object.values(routes).map(route => (
-        <Route
-            path={route.path}
-            component={route.component}
-            exact={route.exact}
-            key={route.path}
-        />
-    ));
+    const routesComponents = Object.values(routes)
+        .map(({ component: Page, title, path, exact }) => (
+            <Route
+                path={path}
+                exact={exact}
+                key={path}
+                render={props => <Page {...props} title={title} />}
+            />
+        ));
 
     return (
         <>

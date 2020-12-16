@@ -11,10 +11,6 @@ const renderDropZone = (props) => {
     const [dragIndex, setDragIndex] = React.useState(null);
 
     useEffect(() => {
-        window.scrollTo(0, 0)
-    }, [])
-
-    useEffect(() => {
         let isMounted = true;
 
         if (input.value.length) {

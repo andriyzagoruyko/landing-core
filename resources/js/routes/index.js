@@ -49,24 +49,26 @@ export const navList = [
     {
         label: 'Main page',
         to: '/',
+        exact: true,
         icon: <HomeIcon color="primary" />
     },
     {
-        label: 'Products',
+        label: 'Store',
         icon: <ShoppingCartIcon color="primary" />,
         submenu: [
             {
-                label: 'List',
-                to: '/products',
+                label: 'Products',
+                to: '/products?page=1',
+                exact: false,
             }
         ]
     }
 ];
 
-export const routesMatch = (routePath, url) => {
+export const routesMatch = (routePath, url, exact = true) => {
     const match = matchPath(url, {
         path: routePath,
-        exact: true
+        exact
     });
 
     return (match != null && match.params) != false

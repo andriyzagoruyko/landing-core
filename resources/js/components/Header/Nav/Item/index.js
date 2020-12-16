@@ -1,28 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import { Link as RouterLink } from 'react-router-dom';
-import { urlBuilder } from '~/routes';
+import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { ListItemIcon, ListItem, ListItemText } from '@material-ui/core/';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
 const useStyles = makeStyles(theme => ({
-    activeItem: {
-        backgroundColor: 'rgba(0, 0, 0, 0.07)'
-    },
     icon: {
         minWidth: theme.spacing(4)
-    }
+    },
+    submenuItem: {
+        paddingLeft: theme.spacing(6)
+    },
 }));
 
-const NavItem = ({ to, primary, icon, active, hasSubmenu, onClick, className }) => {
+const NavItem = ({ to, primary, icon, exact, active, hasSubmenu, onClick, sumbenuChild }) => {
     const classes = useStyles();
 
     const renderLink = url => {
         return React.useMemo(
-            () => React.forwardRef((itemProps, ref) => <RouterLink to={url} ref={ref} {...itemProps} />),
+            () => React.forwardRef((itemProps, ref) => <NavLink
+                activeStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.07)' }}
+                to={url}
+                ref={ref}
+                exact={exact}
+                aria-current='page'
+                {...itemProps}
+            />),
             [url],
         );
     }
@@ -31,10 +36,12 @@ const NavItem = ({ to, primary, icon, active, hasSubmenu, onClick, className }) 
         <ListItem
             button
             component={to ? renderLink(to) : null}
-            className={classNames((active ? classes.activeItem : null), className)}
             onClick={onClick}
+            className={sumbenuChild ? classes.submenuItem : null}
         >
-            {icon ? <ListItemIcon className={classes.icon}>{icon}</ListItemIcon> : null}
+            {icon
+                ? <ListItemIcon className={classes.icon}>{icon}</ListItemIcon>
+                : null}
             <ListItemText primary={primary} />
             {hasSubmenu && (active ? <ExpandLess /> : <ExpandMore />)}
         </ListItem>
@@ -46,6 +53,7 @@ NavItem.propTypes = {
     primary: PropTypes.string,
     icon: PropTypes.element,
     active: PropTypes.bool,
+    sumbenuChild: PropTypes.bool,
     hasSubmenu: PropTypes.bool,
     onClick: PropTypes.func,
 };

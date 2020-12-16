@@ -11,21 +11,15 @@ const ProductCard = ({ id, checked, title, article, available, description, pric
 
     return (
         <Grid item xs={12} sm={6} md={4} lg={3} >
-            <Card className={classes.card} raised>
+            <Card className={classes.card} variant="outlined">
                 <CardContent >
                     <div>
                         <FormControlLabel
                             label={title}
                             className={classes.cardTitle}
                             control={
-                                <Checkbox
-                                    color="primary"
-                                    checked={checked}
-                                    onChange={onSelect}
-                                    color="secondary"
-                                />
+                                <Checkbox checked={checked} onChange={onSelect} color="secondary" />
                             }
-
                         />
                     </div>
                     <Typography variant="body2" color="textSecondary" component="p">

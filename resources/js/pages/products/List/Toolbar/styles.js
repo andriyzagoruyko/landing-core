@@ -34,7 +34,11 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         alignItems: 'center',
         flex: '1 1 auto',
-        margin: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+        margin: `${theme.spacing(1)}px ${theme.spacing(1)}px`,
+        [theme.breakpoints.down('md')]: {
+            justifyContent: 'center',
+            flex: '1 1 100%'
+        },
     },
     search: {
         margin: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
@@ -43,12 +47,12 @@ const useStyles = makeStyles(theme => ({
     filter: {
         display: 'flex',
         flex: '1 1 auto',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+        [theme.breakpoints.down('md')]: {
+            flex: '0',
+        },
     },
-    button: {
-        marginRight: theme.spacing(1),
-    },
-    tooltip: {
+    selectedButtons: {
         marginLeft: 'auto'
     },
 }));

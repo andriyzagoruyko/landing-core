@@ -37,7 +37,10 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        $product = Product::create($request->all());
+        $data = $request->all();
+        $data['saleEnabled'] = $request->saleEnabled ? 1 : 0;
+
+        $product = Product::create($data);
 
         if ($request->hasFile('images')) {
             $product->addMultipleMediaFromRequest(['images'])
@@ -69,8 +72,11 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product)
     {
+        $data = $request->all();
+        $data['saleEnabled'] = $request->saleEnabled ? 1 : 0;
         $updateMedia = $request->has('updateMedia') ? $request->updateMedia : [];
-        $product->update($request->all());
+
+        $product->update($data);
 
         if ($request->hasFile('images')) {
             $product->addMultipleMediaFromRequest(['images'])
@@ -108,7 +114,7 @@ class ProductController extends Controller
         $product->delete();
 
         if ($request->has('page')) {
-            $limit = $request->has('limit') ? $request->limit : 10;
+            $limit = $request->has('limit') ? $request->limit : 12;
             $paginate = Product::orderBy('id', 'DESC')->paginate($limit);
             
             return response()->json($paginate, 200);

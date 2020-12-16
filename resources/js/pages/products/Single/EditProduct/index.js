@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import WithTitle from "~/hocs/WithTitle"
 import { fetchSingleProduct, updateProduct } from '~s/actionCreators/products';
 import FormLayout from '../Form'
 import Page404 from '~p/errors/e404'
 
-const EditProduct = ({ updateProduct, fetchSingleProduct, product, isError, match }) => {
+const EditProduct = (props) => {
+    const {
+        updateProduct,
+        fetchSingleProduct,
+        product,
+        isError,
+        match
+    } = props;
+
     const [productId, setProductId] = useState(0);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+
         if (match.params.id) {
             const id = parseInt(match.params.id);
             setProductId(id);
@@ -45,11 +56,8 @@ const mapStateToProps = state => {
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        fetchSingleProduct: (id) => dispatch(fetchSingleProduct(id)),
-        updateProduct: (id, data) => dispatch(updateProduct(id, data)),
-    }
-}
+const ConnectedEditProduct = connect(mapStateToProps, {
+    fetchSingleProduct, updateProduct
+})(EditProduct);
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditProduct);
+export default WithTitle(ConnectedEditProduct);

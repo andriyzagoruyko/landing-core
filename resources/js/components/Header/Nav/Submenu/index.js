@@ -4,29 +4,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List, Collapse } from '@material-ui/core/';
 import NavItem from '../Item';
-import { makeStyles } from '@material-ui/core/styles';
-import { routesMatch } from '~/routes';
 
-const useStyles = makeStyles(theme => ({
-    submenuItem: {
-        paddingLeft: theme.spacing(6)
-    },
-}));
-
-const NavSubmenu = ({ list, isOpened, currentRoute, onItemClick }) => {
-    const classes = useStyles();
+const NavSubmenu = ({ list, isOpened, onItemClick }) => {
     return (
         <Collapse in={isOpened} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-                {list.map(({ icon, label, to }) => (
+                {list.map(({ icon, label, to, exact }) => (
                     <NavItem
                         to={to}
                         primary={label}
                         icon={icon}
-                        active={routesMatch(currentRoute, to)}
+                        exact={exact}
                         onClick={onItemClick}
                         key={to}
-                        className={classes.submenuItem}
+                        sumbenuChild
                     />
                 ))}
             </List>
@@ -37,7 +28,6 @@ const NavSubmenu = ({ list, isOpened, currentRoute, onItemClick }) => {
 NavSubmenu.propTypes = {
     list: PropTypes.array.isRequired,
     isOpened: PropTypes.bool,
-    currentRoute: PropTypes.string,
     onItemClick: PropTypes.func,
 };
 

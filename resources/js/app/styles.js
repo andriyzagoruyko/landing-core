@@ -30,7 +30,6 @@ const useStyles = makeStyles(theme => ({
         flexGrow: 1,
         marginTop: theme.spacing(4),
 
-        
         [theme.breakpoints.down('xs')]: {
             marginTop: theme.spacing(2),
         },
