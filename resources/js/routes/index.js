@@ -1,9 +1,8 @@
 import React from 'react';
 import Page404 from '~p/errors/e404';
 import Home from '~p/home';
-import ProductList from '~p/products/list';
-import AddProduct from '~p/products/Single/AddProduct';
-import EditProduct from '~p/products/Single/EditProduct';
+import ProductList from '~p/products/List';
+import ProductForm from '~p/products/Form/';
 import HomeIcon from '@material-ui/icons/Home';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { matchPath, generatePath } from "react-router-dom";
@@ -27,14 +26,14 @@ export const routes = {
         name: 'productsAdd',
         title: 'Add product',
         path: '/products/add',
-        component: AddProduct,
+        component: ProductForm,
         exact: true,
     },
     productsEdit: {
         name: 'productsEdit',
         title: 'Edit product',
         path: '/products/:id',
-        component: EditProduct,
+        component: ProductForm,
         exact: true,
     },
     notFound: {

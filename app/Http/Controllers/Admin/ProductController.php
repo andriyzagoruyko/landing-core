@@ -6,7 +6,6 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Filters\ProductsFilter;
 use App\Http\Controllers\Controller;
-use Illuminate\Pagination\Paginator;
 use App\Http\Requests\ProductRequest;
 
 class ProductController extends Controller
@@ -41,6 +40,7 @@ class ProductController extends Controller
         $data['saleEnabled'] = $request->saleEnabled ? 1 : 0;
 
         $product = Product::create($data);
+        $product->categories()->sync(explode(',', $data['categoriesIds']));
 
         if ($request->hasFile('images')) {
             $product->addMultipleMediaFromRequest(['images'])
@@ -77,6 +77,7 @@ class ProductController extends Controller
         $updateMedia = $request->has('updateMedia') ? $request->updateMedia : [];
 
         $product->update($data);
+        $product->categories()->sync(explode(',', $data['categoriesIds']));
 
         if ($request->hasFile('images')) {
             $product->addMultipleMediaFromRequest(['images'])
@@ -111,6 +112,7 @@ class ProductController extends Controller
      */
     public function destroy(Request $request, Product $product)
     {
+        $product->categories()->sync([]);
         $product->delete();
 
         if ($request->has('page')) {

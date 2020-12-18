@@ -1,13 +1,15 @@
 import axios from './createAxios';
 
+const ENDPOINT = 'products';
+
 const all = async (params) => {
-    const result = await axios.get(`products?${params}`);
+    const result = await axios.get(`${ENDPOINT}?${params}`);
 
     return result.data;
 }
 
 const get = async (id) => {
-    const result = await axios.get(`products/${id}`);
+    const result = await axios.get(`${ENDPOINT}/${id}`);
 
     return result.data;
 }
@@ -16,9 +18,9 @@ const remove = async (id) => {
     let result;
 
     if (Array.isArray(id)) {
-        result = await axios.post(`products/deletes`, JSON.stringify(id));
+        result = await axios.post(`${ENDPOINT}/deletes`, JSON.stringify(id));
     } else {
-        result = await axios.delete(`products/${id}`);
+        result = await axios.delete(`${ENDPOINT}/${id}`);
     }
 
     return result.data;
@@ -39,13 +41,15 @@ const create = async (data) => {
         }
     }
 
-    const result = await axios.post('products', ProductFormData);
+    const result = await axios.post(`${ENDPOINT}`, ProductFormData);
 
     return result.data;
 }
 
 const update = async (id, data) => {
     let ProductFormData = new FormData();
+
+    console.log(data);
 
     ProductFormData.append('_method', 'PATCH');
 
@@ -68,7 +72,7 @@ const update = async (id, data) => {
         }
     }
 
-    const result = await axios.post(`products/${id}`, ProductFormData);
+    const result = await axios.post(`${ENDPOINT}/${id}`, ProductFormData);
 
     return result.data;
 }

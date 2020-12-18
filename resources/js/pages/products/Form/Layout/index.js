@@ -1,19 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { reduxForm } from 'redux-form';
-import validate from './validation';
+import validate from '../validation';
 import Form from '~c/common/Form/';
 import Section from '~c/common/Form/Section';
 import Field from '~c/common/Form/Field';
 import CheckboxField from '~c/common/Form/CheckboxField';
 import Upload from '~c/common/Form/Upload';
 import Button from '~c/common/Form/Button';
+import MultipleSelectChip from '~c/common/Form/MultipleSelectChip';
 
-const ProductForm = ({ isEdit, onSubmit, handleSubmit }) => {
+const FormLayout = ({ isEdit, categories, onSubmit, handleSubmit }) => {
     return (
         <Form onSubmit={handleSubmit(onSubmit)} >
             <Section title="General" divider>
                 <Field name="title" label="Product name" />
                 <Field name="article" label="Product article" />
+                <Section dense>
+                    <MultipleSelectChip
+                        name="categoriesIds"
+                        label="Product categories"
+                        emptyText="Without category"
+                        items={categories}
+                    />
+                </Section>
             </Section>
 
             <Section title="Selling" divider>
@@ -51,4 +60,4 @@ export default reduxForm({
     form: 'ProductForm',
     enableReinitialize: true,
     validate
-})(ProductForm);
+})(FormLayout);

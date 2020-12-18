@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
@@ -38,9 +39,10 @@ class ProductFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (Product $product) {
-            $path = 'public/storage/';
-            $image = $this->faker->image($path, 900, 500, null, false);
-            $product->addMedia($path.$image)->toMediaCollection('images');
+            $image = $this->faker->image('public/storage', 900, 500, null, true);
+            $categories = Category::all()->random(3);
+            $product->categories()->attach($categories);
+            $product->addMedia($image)->toMediaCollection('images');
         });
     }
 }

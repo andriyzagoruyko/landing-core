@@ -4,7 +4,7 @@ import { Grid, Card, CardActions, CardContent, Typography, Checkbox, FormControl
 import Aviability from '../Aviability'
 import useStyles from './styles';
 import ProgresiveImage from '~c/common/ProgresiveImage';
-import ActionsButtons from '../ActionsButtons'
+import ActionsButtons from '~c/common/List/ActionsButtons'
 
 const ProductCard = ({ id, checked, title, article, available, description, price, images, onSelect }) => {
     const classes = useStyles();

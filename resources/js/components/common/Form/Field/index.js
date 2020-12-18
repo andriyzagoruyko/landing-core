@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { Field } from 'redux-form'
 import { TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
     textField: {

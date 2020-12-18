@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { fetchSingleProduct, updateProduct, createProduct } from '~s/actionCreators/products';
+import { fetchCategoriesList } from '~s/actionCreators/categories'
 import WithTitle from "~/hocs/WithTitle"
-import { fetchSingleProduct, updateProduct } from '~s/actionCreators/products';
-import FormLayout from '../Form'
+import Form from './Layout'
 import Page404 from '~p/errors/e404'
 
-const EditProduct = (props) => {
+const ProductForm = (props) => {
     const {
         updateProduct,
         fetchSingleProduct,
+        fetchCategoriesList,
+        createProduct,
         product,
+        categories,
         isError,
         match
     } = props;
@@ -18,6 +22,10 @@ const EditProduct = (props) => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
+
+        if (!categories.length) {
+            fetchCategoriesList();
+        }
 
         if (match.params.id) {
             const id = parseInt(match.params.id);
@@ -29,10 +37,10 @@ const EditProduct = (props) => {
         }
     }, []);
 
-    const handleSubmit = (data) => {
-        if (productId) {
-            updateProduct(productId, data);
-        }
+    const handleSubmit = data => {
+        productId
+            ? updateProduct(productId, data)
+            : createProduct(data);
     }
 
     if (isError) {
@@ -40,9 +48,10 @@ const EditProduct = (props) => {
     }
 
     return (
-        <FormLayout
+        <Form
             isEdit
-            initialValues={product}
+            categories={categories}
+            initialValues={productId ? product : {}}
             onSubmit={handleSubmit}
         />
     );
@@ -51,13 +60,13 @@ const EditProduct = (props) => {
 const mapStateToProps = state => {
     return {
         product: state.products.single,
+        categories: state.categories.items,
         isError: state.products.isSingleError,
-        location: state.router.location
     }
 }
 
-const ConnectedEditProduct = connect(mapStateToProps, {
-    fetchSingleProduct, updateProduct
-})(EditProduct);
+const ConnectedProductForm = connect(mapStateToProps, {
+    fetchSingleProduct, updateProduct, fetchCategoriesList, createProduct
+})(ProductForm);
 
-export default WithTitle(ConnectedEditProduct);
+export default WithTitle(ConnectedProductForm);

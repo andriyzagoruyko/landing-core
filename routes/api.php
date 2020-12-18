@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,4 +27,8 @@ Route::prefix('admin')->group(function () {
     ]);
     
     Route::post('products/deletes', [ProductController::class, 'deletes']);
+
+    Route::resource('categories', CategoryController::class)->except([
+        'create', 'edit'
+    ]);
 });

@@ -4,7 +4,7 @@ namespace App\Filters;
 
 class ProductsFilter extends QueryFilter
 {
-     /* public function category($id)
+    /* public function category($id)
     {
         return $this->builder->where('category_id', $id);
     }*/

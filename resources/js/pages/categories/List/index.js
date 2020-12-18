@@ -1,30 +1,19 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux'
-import {
-    removeProducts,
-    changePage, selectProducts,
-    initializeProducts,
-    submitSearch,
-    submitFilters,
-    setProductsSearch,
-    setProductsFilters,
-    setProductsViewType,
-} from '~s/actionCreators/products'
+import { fetchCategoriesList } from '~s/actionCreators/categories'
 import { filterStructure, tableStructure, perPageOptions } from './constants'
 import { parseQuery } from '~/helpers/query'
 import { Container, Paper } from '@material-ui/core';
 import WithTitle from "~/hocs/WithTitle"
 import Pagination from '~c/common/Pagination/';
 import Page404 from '~p/errors/e404';
-import Toolbar from '~c/common/ListToolbar/';
+import Toolbar from '~c/common/List/Toolbar/';
 import ProductsLayout from './Layout'
 
 const ProductsList = (props) => {
     const {
-        viewType,
         isError,
         isFetching,
-        isInitialized,
         lastQueryParams,
         total,
         maxPages,

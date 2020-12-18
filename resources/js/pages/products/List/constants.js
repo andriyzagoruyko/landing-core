@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Aviability from './Layout/Aviability'
-import ActionsButtons from './Layout/ActionsButtons'
+import ActionsButtons from '~c/common/List/ActionsButtons'
 
 export const tableStructure = [
     {

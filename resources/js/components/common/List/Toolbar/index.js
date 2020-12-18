@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import useStyles from './styles'
 import clsx from 'clsx'
-import { Toolbar, Tooltip, IconButton, Typography, Box} from '@material-ui/core';
+import { Toolbar, Tooltip, IconButton, Typography, Box } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import UndoIcon from '@material-ui/icons/Undo';
 import ViewListIcon from '@material-ui/icons/ViewList';
@@ -59,9 +59,11 @@ const CustomTableToolbar = (props) => {
                 )
                 : (
                     <Box className={classes.main}>
-                        <Box className={classes.search}>
-                            <Search placeholder="Search by name and article" {...searchProps} />
-                        </Box>
+                        {Boolean(searchProps) && (
+                            <Box className={classes.search}>
+                                <Search placeholder="Search by name and article" {...searchProps} />
+                            </Box>
+                        )}
 
                         <Box className={classes.section}>
                             <Tooltip title="Add product">
@@ -76,29 +78,35 @@ const CustomTableToolbar = (props) => {
                         </Box>
 
                         <Box className={classes.section}>
-                            <div className={classes.filter}>
-                                <Filter show {...filterProps} />
-                            </div>
-                            <Tooltip title="Table view">
-                                <IconButton
-                                    aria-label="table"
-                                    onClick={() => onChangeView('table')}
-                                    color={view === 'table' ? 'primary' : 'default'}
-                                >
-                                    <ViewListIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Cards view">
-                                <IconButton
-                                    aria-label="cards"
-                                    onClick={() => onChangeView('grid')}
-                                    color={view === 'grid' ? 'primary' : 'default'}
-                                >
-                                    <ViewComfyIcon />
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
+                            {Boolean(filterProps) && (
+                                <div className={classes.filter}>
+                                    <Filter show {...filterProps} />
+                                </div>
+                            )}
 
+                            {Boolean(view) && (
+                                <>
+                                    <Tooltip title="Table view">
+                                        <IconButton
+                                            aria-label="table"
+                                            onClick={() => onChangeView('table')}
+                                            color={view === 'table' ? 'primary' : 'default'}
+                                        >
+                                            <ViewListIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Cards view">
+                                        <IconButton
+                                            aria-label="cards"
+                                            onClick={() => onChangeView('grid')}
+                                            color={view === 'grid' ? 'primary' : 'default'}
+                                        >
+                                            <ViewComfyIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </>
+                            )}
+                        </Box>
                     </Box>
                 )}
         </Toolbar>

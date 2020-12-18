@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Table from '~c/common/Table'
 import ProductsGrid from './Grid'
-import EmptyText from './EmptyText'
+import EmptyText from '~c/common/List/EmptyText'
 
 const Products = (props) => {
     const {
