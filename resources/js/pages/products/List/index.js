@@ -1,155 +1,105 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux'
-import {
-    removeProducts,
-    changePage, selectProducts,
-    initializeProducts,
-    submitSearch,
-    submitFilters,
-    setProductsSearch,
-    setProductsFilters,
-    setProductsViewType,
-} from '~s/actionCreators/products'
+import React, { useCallback, useMemo } from 'react';
 import { filterStructure, tableStructure, perPageOptions } from './constants'
-import { parseQuery } from '~/helpers/query'
-import { Container, Paper } from '@material-ui/core';
-import WithTitle from "~/hocs/WithTitle"
-import Pagination from '~c/common/Pagination/';
-import Page404 from '~p/errors/e404';
-import Toolbar from '~c/common/ListToolbar/';
-import ProductsLayout from './Layout'
+import EntityListPage from '~/hocs/EntityListPage';
+import PageList from '~c/common/List'
+import useTitle from '~/hooks/useTitle';
+import ActionsButtons from '~c/common/List/ActionsButtons'
+import ProductCard from './Card'
 
 const ProductsList = (props) => {
     const {
-        viewType,
-        isError,
-        isFetching,
-        isInitialized,
-        lastQueryParams,
-        total,
-        maxPages,
-        items,
-        selected,
         searchKeyword,
+        isSearchActive,
         filters,
-        history,
-        initializeProducts,
-        removeProducts,
-        selectProducts,
+        viewType,
+        entities,
+        status,
         changePage,
-        submitSearch,
-        submitFilters,
-        setProductsSearch,
-        setProductsFilters,
-        setProductsViewType,
+        setViewType,
+        page,
+        limit,
+        total,
+        selected,
+        maxPages,
+        setSearchKeyword,
+        setFilters,
+        confirmFilters,
+        removeEntitiesFromPage,
+        selectEntity,
+        selectMultiple,
     } = props;
 
-    const selectedCount = Object.values(selected).filter(value => value).length;
-    const locationSearch = history.location.search || lastQueryParams;
-    const {
-        page = 1,
-        limit = perPageOptions[0],
-        search = '',
-        ...filterParams
-    } = parseQuery(locationSearch);
-    const isSearchActive = search.length > 0;
+    useTitle(props.title);
 
-    useEffect(() => {
-        if (history.action === 'PUSH' || (!isInitialized && history.action === 'POP')) {
-            initializeProducts(locationSearch, search, filterParams, filterStructure);
-        }
-    }, [history.location]);
+    const renderActionButtons = useCallback(id => {
+        return <ActionsButtons
+            onRemove={() => removeEntitiesFromPage([id])}
+            onEdit={() => { }}
+        />
+    }, [entities]);
 
-    if (isError || !perPageOptions.includes(limit)) {
-        return <Page404 />
-    }
-    const handleChangeViewType = (viewType) => setProductsViewType(viewType);
+    const renderCard = useCallback(item => (
+        <ProductCard
+            key={item.id}
+            checked={selected.includes(item.id) || false}
+            onSelect={() => selectEntity(item.id)}
+            renderActionButtons={renderActionButtons}
+            {...item}
+        />
+    ), [entities, selected]);
 
-    const handleChangePage = (e, newPage) => changePage(newPage, limit);
-    const handleChangePerPage = value => changePage(1, parseInt(value, 10));
-
-    const handleRemoveSelected = () => removeProducts(items.filter(i => selected[i.id]).map(i => i.id));
-
-    const handleChangeSearch = (search) => setProductsSearch(search);
-    const handleSearch = () => submitSearch();
-
-    const handleChangeFilter = filters => setProductsFilters(filters);
-    const handleSubmitFilter = filters => submitFilters(filters);
+    const tableColumns = useMemo(() => tableStructure(renderActionButtons), [entities]);
 
     return (
-        <>
-            <Container component={Paper} style={{ padding: 0 }} maxWidth={false} >
-                <Toolbar
-                    selectedCount={selectedCount}
-                    onRemove={handleRemoveSelected}
-                    onReset={() => selectProducts()}
-                    total={total}
-                    page={page}
-                    maxPages={maxPages}
-                    view={viewType}
-                    onChangeView={(viewType) => handleChangeViewType(viewType)}
-                    searchProps={{
-                        value: searchKeyword,
-                        active: isSearchActive,
-                        onChange: handleChangeSearch,
-                        onSearch: handleSearch,
-                    }}
-                    filterProps={{
-                        filters,
-                        onChange: (filters) => handleChangeFilter(filters),
-                        onSubmit: handleSubmitFilter
-                    }}
-                />
-
-                <ProductsLayout
-                    view={viewType}
-                    items={items}
-                    columns={tableStructure}
-                    selectedItems={selected}
-                    selectedCount={selectedCount}
-                    onSelect={selectProducts}
-                    onSelectAll={selectProducts}
-                    searchActive={isSearchActive}
-                    isLoading={isFetching}
-                />
-            </Container>
-            {(items.length > 0) && (
-                <Pagination
-                    disabled={isFetching}
-                    maxPages={maxPages}
-                    siblingCount={1}
-                    page={page}
-                    perPage={limit}
-                    perPageOptions={perPageOptions}
-                    variant="outlined"
-                    onChangePage={handleChangePage}
-                    onChangePerPage={(e) => handleChangePerPage(e.target.value)}
-                />
-            )}
-        </>
-    )
+        <PageList
+            checkbox
+            entityName="products"
+            entities={entities}
+            status={status}
+            viewType={viewType}
+            page={page}
+            limit={limit}
+            total={total}
+            maxPages={maxPages}
+            selected={selected}
+            isSearchActive={isSearchActive}
+            onSelect={selectEntity}
+            onMultipleSelect={() => selectMultiple(entities.map(e => e.id))}
+            toolbarProps={{
+                onChangeView: setViewType,
+                onRemoveSelected: () => removeEntitiesFromPage(selected),
+                onResetSelected: () => selectMultiple([]),
+            }}
+            searchProps={{
+                value: searchKeyword,
+                active: isSearchActive,
+                onChange: setSearchKeyword,
+                onSearch: confirmFilters,
+            }}
+            filterProps={{
+                filters,
+                onChange: setFilters,
+                onSubmit: confirmFilters
+            }}
+            paginationProps={{
+                perPageOptions: perPageOptions,
+                onChangePage: (e, newPage) => changePage(newPage, limit),
+                onChangePerPage: (e) => changePage(1, parseInt(e.target.value, 10)),
+            }}
+            tableProps={{ columns: tableColumns }}
+            gridProps={{ renderCard }}
+        />
+    );
 }
 
-const mapStateToProps = state => {
-    return {
-        viewType: state.products.viewType,
-        isInitialized: state.products.isInitialized,
-        isError: state.products.isError,
-        isFetching: state.products.isFetching,
-        total: state.products.total,
-        lastQueryParams: state.products.lastQueryParams,
-        items: state.products.items,
-        maxPages: state.products.maxPages,
-        selected: state.products.selected,
-        searchKeyword: state.products.searchKeyword,
-        filters: state.products.filters
-    }
-}
-
-const ConnectedProductsList = connect(mapStateToProps, {
-    initializeProducts, removeProducts, selectProducts, 
-    changePage, submitSearch, submitFilters, 
-    setProductsSearch, setProductsFilters, setProductsViewType
+export default EntityListPage({
+    entityName: 'product',
+    perPageOptions,
+    filterStructure,
+    initialParams: {
+        page: 1,
+        limit: perPageOptions[0]
+    },
+    restoreOnBack: true,
+    restoreAlways: ['limit']
 })(ProductsList);
-
-export default WithTitle(ConnectedProductsList);

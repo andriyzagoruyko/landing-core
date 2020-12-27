@@ -58,18 +58,19 @@ const Filter = ({ show = true, filters, onChange, onSubmit }) => {
 
         filter.active = !filter.active;
 
+        onChange({ ...filters, [filterName]: filter });
+
         if (submit) {
-            onSubmit({ ...filters, [filterName]: filter });
-        } else {
-            onChange({ ...filters, [filterName]: filter });
+            onSubmit();
         }
     }
 
     const handleSubmit = (value) => {
-        onSubmit({
+        onChange({
             ...filters,
             [currentFilter]: { ...filters[currentFilter], value }
         });
+        onSubmit();
         setCurrentFilter('');
     }
 

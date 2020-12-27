@@ -1,9 +1,8 @@
 
 import React from 'react';
-import Aviability from './Layout/Aviability'
-import ActionsButtons from '~c/common/List/ActionsButtons'
+import Aviability from './Aviability'
 
-export const tableStructure = [
+export const tableStructure = (renderActionButtons) => [
     {
         name: 'id',
         label: 'ID',
@@ -43,7 +42,7 @@ export const tableStructure = [
         label: 'Actions',
         align: 'right',
         disablePadding: false,
-        component: (product) => <ActionsButtons id={product.id} />,
+        component: (product) => renderActionButtons(product.id),
     }
 ]
 

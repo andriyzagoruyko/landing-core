@@ -57,7 +57,7 @@ export const navList = [
         submenu: [
             {
                 label: 'Products',
-                to: '/products?page=1',
+                to: '/products',
                 exact: false,
             }
         ]

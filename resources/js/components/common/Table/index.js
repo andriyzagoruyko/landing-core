@@ -5,15 +5,13 @@ import { Table, TableContainer } from '@material-ui/core';
 import Head from './Head';
 import Body from './Body';
 
-
 const CustomTable = (props) => {
     const {
         columns,
         rows,
         checkbox,
         emptyText,
-        selectedRows,
-        selectedCount,
+        selected,
         onSelect,
         onSelectAll,
         ...restProps
@@ -27,14 +25,14 @@ const CustomTable = (props) => {
                 <Head
                     columns={columns}
                     checkbox={checkbox}
-                    checked={selectedCount > 0}
-                    indeterminate={selectedCount > 0 && selectedCount < rows.length}
+                    checked={selected.length > 0}
+                    indeterminate={selected.length  > 0 && selected.length < rows.length}
                     onSelectAll={onSelectAll}
                 />
                 <Body
                     columns={columns}
                     rows={rows}
-                    selectedRows={selectedRows}
+                    selectedRows={selected}
                     checkbox={checkbox}
                     onSelect={onSelect} />
             </Table>
@@ -54,4 +52,4 @@ CustomTable.defaultProps = {
     onSelect: () => { },
 };
 
-export default CustomTable;
+export default React.memo(CustomTable);

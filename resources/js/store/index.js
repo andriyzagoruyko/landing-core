@@ -1,11 +1,12 @@
-import { createStore, applyMiddleware, compose } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension';
-import thunk from 'redux-thunk';
-import { rootReducer } from './reducers/root'
-import { routerMiddleware } from 'connected-react-router'
+import { createStore, applyMiddleware } from 'redux'
 import { createBrowserHistory } from 'history'
-import { historyState } from './middlewares/historyState'
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { routerMiddleware } from 'connected-react-router'
+import normalizeMiddleware from './middlewares/normalize'
+import pagesMiddleware from './middlewares/pages'
+import thunk from 'redux-thunk';
 import logger from 'redux-logger'
+import rootReducer from '~s/ducks'
 
 export const history = createBrowserHistory({
     basename: '/admin/',
@@ -17,9 +18,10 @@ export default function configureStore() {
         composeWithDevTools(
             applyMiddleware(
                 routerMiddleware(history),
-                historyState(history),
+                normalizeMiddleware,
+                pagesMiddleware,
                 thunk,
-                //logger
+                logger
             )
         ),
     );

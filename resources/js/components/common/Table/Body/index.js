@@ -9,15 +9,16 @@ const CustomTableBody = ({ columns, rows, selectedRows, checkbox, onSelect }) =>
         }
     }
 
+
     return (
         <TableBody>
-            {rows.map(row => (
+            {Object.values(rows).map(row => (
                 <TableRow hover key={row.id} onClick={(e) => handleClickRow(e, row.id)}>
                     {checkbox && (
                         <TableCell padding="checkbox">
                             <Checkbox
                                 color="secondary"
-                                checked={selectedRows[row.id] || false}
+                                checked={selectedRows.includes(row.id) || false}
                                 onChange={() => onSelect(row.id)}
                             />
                         </TableCell>
@@ -43,7 +44,7 @@ CustomTableBody.propTypes = {
     columns: PropTypes.array.isRequired,
     rows: PropTypes.array.isRequired,
     checkbox: PropTypes.bool,
-    selectedRows: PropTypes.object,
+    selectedRows: PropTypes.array,
     onSelect: PropTypes.func
 };
 

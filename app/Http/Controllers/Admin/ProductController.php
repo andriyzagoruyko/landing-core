@@ -18,14 +18,18 @@ class ProductController extends Controller
     public function index(ProductsFilter $filter)
     {
         $limit = $filter->request->has('limit') ? $filter->request->limit : 12;
-        $query = Product::filter($filter);
-        $paginate = $query->orderBy('id', 'DESC')->paginate($limit);
+        $query = Product::orderBy('id', 'DESC')->filter($filter);
+        $paginate = $query->paginate($limit);
 
         if ($limit > 100 || $paginate->currentPage() > $paginate->lastPage()) {
             return response()->json('Not found', 404);
         }
         
-        return $paginate;
+        return [
+            "total" => $paginate->total(),
+            "maxPages" => $paginate->lastPage(),
+            "items" => $paginate->items(),
+        ];
     }
 
     /**
@@ -60,7 +64,9 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return $product;
+        return [
+            'items' => [$product]
+        ];
     }
 
     /**

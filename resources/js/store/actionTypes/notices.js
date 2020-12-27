@@ -1,3 +1,0 @@
-export const NOTICE_DISPLAY = "NOTICE_DISPLAY"
-export const NOTICE_FADE_OUT = "NOTICE_FADE_OUT"
-export const NOTICE_REMOVE = "NOTICE_REMOVE"

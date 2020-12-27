@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux'
 import { makeStyles, Grow } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
-import { removeNotice, fadeOutNotice } from '~s/actionCreators/notices'
+import actions from '~s/ducks/notices/operations'
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -66,8 +66,8 @@ const mapStateToProps = state => {
 }
 const mapDispatchToProps = dispatch => {
     return {
-        fadeOutNotice: (id) => dispatch(fadeOutNotice(id)),
-        removeNotice: (id) => dispatch(removeNotice(id)),
+        fadeOutNotice: (id) => dispatch(actions.fadeOutNotice(id)),
+        removeNotice: (id) => dispatch(actions.removeNotice(id)),
     }
 }
 

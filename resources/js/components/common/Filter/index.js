@@ -1,12 +1,12 @@
 
 import Filter from './Filter';
 
-const initializeFilter = (filterStructure, filterQuery = {}) => {
+const initializeFilter = (filterStructure, filterParams = {}) => {
     let filters = {};
 
     filterStructure.forEach(({ name, ...item }) => {
-        const active = Boolean(filterQuery[name]);
-        const value = filterQuery[name] ? filterQuery[name] : [];
+        const active = Boolean(filterParams[name]);
+        const value = filterParams[name] ? filterParams[name] : [];
         filters[name] = { ...item, name, active, value }
     });
 

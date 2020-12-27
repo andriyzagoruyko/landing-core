@@ -24,7 +24,11 @@ class CategoryController extends Controller
             return response()->json('Not found', 404);
         }
 
-        return $paginate;
+        return [
+            "total" => $paginate->total(),
+            "maxPages" => $paginate->lastPage(),
+            "items" => $paginate->items(),
+        ];
     }
 
     /**
@@ -57,7 +61,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return $category;
+        return [
+            'items' => [$category]
+        ];
     }
 
     /**
