@@ -37,9 +37,14 @@ const getCollection = (state, entityName, key) => {
     return getCollectionByArray(state, entityName, status.result);
 };
 
+const getCollectionCount = (state, entityName, key) => (
+    getCollection(state, entityName, key).length
+)
+
 export default {
     getEntity,
     getCollectionByArray,
     getCollection,
+    getCollectionCount,
     getStatus
 }

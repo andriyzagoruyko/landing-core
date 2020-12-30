@@ -38,5 +38,5 @@ const ProductForm = (props) => {
 
 export default EntitySinglePage({
     entityName: 'product',
-    relations: ['category']
+    appends: ['category']
 })(ProductForm);

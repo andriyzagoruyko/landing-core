@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function LoadingBackdrop({ open = true, ...restProps }) {
+function LoadingBackdrop({ open = true, ...restProps }) {
     const classes = useStyles();
     return (
         <Backdrop open={open} className={classes.backdrop} {...restProps}>
@@ -29,3 +29,5 @@ export default function LoadingBackdrop({ open = true, ...restProps }) {
         </Backdrop>
     );
 }
+
+export default React.memo(LoadingBackdrop);

@@ -7,7 +7,7 @@ import Field from '~c/common/Form/Field';
 import CheckboxField from '~c/common/Form/CheckboxField';
 import Upload from '~c/common/Form/Upload';
 import Button from '~c/common/Form/Button';
-import MultipleSelectChip from '~c/common/Form/MultipleSelectChip';
+import Categories from './Categories';
 
 const FormLayout = ({ isEdit, categories, onSubmit, handleSubmit }) => {
     return (
@@ -16,12 +16,7 @@ const FormLayout = ({ isEdit, categories, onSubmit, handleSubmit }) => {
                 <Field name="title" label="Product name" />
                 <Field name="article" label="Product article" />
                 <Section dense>
-                    <MultipleSelectChip
-                        name="categoriesIds"
-                        label="Product categories"
-                        emptyText="Without category"
-                        items={categories}
-                    />
+                    <Categories />
                 </Section>
             </Section>
 

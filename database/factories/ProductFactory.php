@@ -39,7 +39,7 @@ class ProductFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (Product $product) {
-            $image = $this->faker->image('public/storage', 900, 500, null, true);
+            $image = $this->faker->image('public/storage/faker', 900, 500, null, true);
             $categories = Category::all()->random(3);
             $product->categories()->attach($categories);
             $product->addMedia($image)->toMediaCollection('images');

@@ -7,12 +7,16 @@ const initialStatePage = {
     lastQuery: '',
     viewType: 'grid',
     searchKeyword: '',
+    processing: '',
     filters: {},
     selected: [],
-    isActive: false
+    isActive: false,
+    isFiltersActive: false,
 }
 
 const pageReducer = entityName => (state = initialStatePage, action) => {
+ 
+
     switch (action.type) {
         case composeType(entityTypes.FETCH_SUCCESS, entityName):
             if (action.meta.multiple) {
@@ -33,6 +37,9 @@ const pageReducer = entityName => (state = initialStatePage, action) => {
         case composeType(types.SET_FILTERS, entityName):
             return { ...state, filters: action.payload }
 
+        case composeType(types.SET_FILTERS_ACTIVE, entityName):
+            return { ...state, isFiltersActive: action.payload }
+
         case composeType(types.SET_SELECTED, entityName):
             return { ...state, selected: action.payload }
 
@@ -41,6 +48,9 @@ const pageReducer = entityName => (state = initialStatePage, action) => {
 
         case composeType(types.SET_ACTIVE, entityName):
             return { ...state, isActive: action.payload }
+
+        case composeType(types.SET_PROCESSING, entityName):
+            return { ...state, processing: action.payload }
     }
 
     return state;
@@ -62,12 +72,15 @@ const statusReducer = entityName => (state = {}, action) => {
                     [action.params]: {
                         maxPages: action.payload.maxPages,
                         total: action.payload.total,
-                        ...action.parsedParams
+                        parsedParams: action.parsedParams
                     }
                 }
             }
 
             break;
+
+        case composeType(types.SET_STATUS, entityName):
+            return { ...state, ...action.payload }
 
         /*case composeType(entityTypes.FETCH_ERROR, entityName):
             return {

@@ -29,15 +29,12 @@ const statusReducer = entityName => (state = {}, action) => {
                     isFetching: false,
                     error: null,
                     result: action.payload.items.result,
-                    maxPages: action.payload.maxPages,
-                    ...action.parsedParams
                 }
             }
 
         case composeType(types.FETCH_ERROR, entityName):
             return {
-                ...state,
-                [action.params]: { isFetching: false, error: action.error }
+                ...state, [action.params]: { isFetching: false, error: action.error }
             }
 
         case composeType(types.SET_STATUS, entityName):

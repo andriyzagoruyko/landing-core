@@ -1,4 +1,3 @@
-import { last } from 'lodash';
 import { parseQuery, stringifyQuery } from '~/helpers/query';
 import entity from '~s/ducks/entity/selectors';
 
@@ -14,6 +13,10 @@ const getSelected = (state, entityName) => (
     state.pages[entityName].data.selected
 );
 
+const isSelected = (state, entityName, id) => (
+    getSelected(state, entityName).includes(id)
+)
+
 const getSearchKeyword = (state, entityName) => (
     state.pages[entityName].data.searchKeyword
 );
@@ -26,17 +29,13 @@ const getLastQuery = (state, entityName) => (
     state.pages[entityName].data.lastQuery
 );
 
-/*const getQuery = (state, entityName) => {
-    const currentQuery = state.router.location.search.replace('?', '');
-    const status = entity.getStatus(state, entityName, currentQuery);
+const getCurrentQuery = (state) => (
+    state.router.location.search.replace('?', '')
+)
 
-    if (status.result) {
-        return currentQuery;
-    }
-
-    return getLastQuery(state, entityName);
-}*/
-
+const getProcessing = (state, entityName) => (
+    state.pages[entityName].data.processing
+)
 const isSearchActive = (state, entityName) => (
     getSearchKeyword(state, entityName).length > 0
 );
@@ -45,15 +44,34 @@ const getStatus = (state, entityName, key) => (
     state.pages[entityName].status[key]
 );
 
-const getStatusPage = (state, entityName, key) => {
+const getStatusesdWithSameParams = (state, entityName, key) => {
+    const status = getStatus(state, entityName, key);
+    const statusParams = Object.keys(status.parsedParams);
+    const result = {};
+
+    for (let key in state.pages[entityName].status) {
+        const current = getStatus(state, entityName, key);
+        const currentParams = Object.keys(current.parsedParams);
+
+        if (currentParams.length === statusParams.length
+            && statusParams.every(k => currentParams.includes(k))) {
+            result[key] = { ...current };
+        }
+    }
+
+
+    return result;
+}
+
+const getPage = (state, entityName, key) => {
     const status = getStatus(state, entityName, key);
 
     if (status) {
-        return status.page;
+        return status.parsedParams.page;
     }
 }
 
-const getStatusMaxPages = (state, entityName, key) => {
+const getMaxPages = (state, entityName, key) => {
     const status = getStatus(state, entityName, key);
 
     if (status) {
@@ -61,7 +79,7 @@ const getStatusMaxPages = (state, entityName, key) => {
     }
 }
 
-const getStatusTotal = (state, entityName, key) => {
+const getTotal = (state, entityName, key) => {
     const status = getStatus(state, entityName, key);
 
     if (status) {
@@ -69,29 +87,34 @@ const getStatusTotal = (state, entityName, key) => {
     }
 }
 
-const getStatusLimit = (state, entityName, key) => {
+const getLimit = (state, entityName, key) => {
     const status = getStatus(state, entityName, key);
 
     if (status) {
-        return status.limit;
+        return status.parsedParams.limit;
     }
 }
 
-const getQueryAndParams = (state, entityName, restoreOnComeback = false, restoreAlways = [], initialParams = {}) => {
-    const current = state.router.location.search.replace('?', '');
-    const status = entity.getStatus(state, entityName, current);
-    const last = getLastQuery(state, entityName);
-    const saved = status.result ? current : last;
-    const parsedLastQuery = parseQuery(last);
 
-    let parsed = parseQuery(current);
-    let restored = '';
+const getActivePage = (state) => (
+    Object.keys(state.pages).find(entityName => isActive(state, entityName))
+);
+
+const getQueryAndParams = (state, entityName, restoreOnComeback = false, restoreAlways = [], initialParams = {}) => {
+    const currentQuery = getCurrentQuery(state);
+    const status = entity.getStatus(state, entityName, currentQuery);
+    const lastQuery = getLastQuery(state, entityName);
+    const savedQuery = status.result ? currentQuery : lastQuery;
+    const parsedLastQuery = parseQuery(lastQuery);
+
+    let params = parseQuery(currentQuery);
+    let restoredQuery = '';
     let isParamsRestored = false;
 
     if (restoreOnComeback && !isActive(state, entityName)) {
         for (let key in parsedLastQuery) {
-            if (!parsed[key]) {
-                parsed[key] = parsedLastQuery[key];
+            if (!params[key]) {
+                params[key] = parsedLastQuery[key];
                 isParamsRestored = true;
             }
         }
@@ -99,8 +122,8 @@ const getQueryAndParams = (state, entityName, restoreOnComeback = false, restore
 
     if (Object.keys(initialParams).length) {
         for (let key in initialParams) {
-            if (!parsed[key]) {
-                parsed[key] = restoreAlways.includes(key) && parsedLastQuery[key]
+            if (!params[key]) {
+                params[key] = restoreAlways.includes(key) && parsedLastQuery[key]
                     ? parsedLastQuery[key]
                     : initialParams[key]
 
@@ -110,29 +133,41 @@ const getQueryAndParams = (state, entityName, restoreOnComeback = false, restore
     }
 
     if (isParamsRestored) {
-        restored = stringifyQuery(parsed);
+        restoredQuery = stringifyQuery(params);
     }
 
-    return { parsed, restored, saved, current };
+    return { params, restoredQuery, savedQuery, currentQuery };
 }
 
-const getActivePage = (state) => (
-    Object.keys(state.pages).find(entityName => isActive(state, entityName))
-);
+const getIitialFilters = (filterStructure, filterParams = {}) => {
+    let filters = {};
+
+    filterStructure.forEach(({ name, ...item }) => {
+        const active = Boolean(filterParams[name]);
+        const value = filterParams[name] ? filterParams[name] : [];
+        filters[name] = { ...item, name, active, value }
+    });
+
+    return filters;
+}
 
 export default {
     isActive,
-    getActivePage,
     getViewType,
     getSelected,
+    isSelected,
     getSearchKeyword,
+    getProcessing,
     isSearchActive,
     getFilters,
-   // getQuery,
     getStatus,
-    getStatusPage,
-    getStatusMaxPages,
-    getStatusTotal,
-    getStatusLimit,
-    getQueryAndParams
+    getStatusesdWithSameParams,
+    getPage,
+    getMaxPages,
+    getTotal,
+    getLimit,
+    getActivePage,
+    getCurrentQuery,
+    getQueryAndParams,
+    getIitialFilters,
 }

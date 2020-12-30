@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { filterStructure, tableStructure, perPageOptions } from './constants'
-import EntityListPage from '~/hocs/EntityListPage';
+import EntityCollectionPage from '~/hocs/EntityCollectionPage';
 import PageList from '~c/common/List'
 import useTitle from '~/hooks/useTitle';
 import ActionsButtons from '~c/common/List/ActionsButtons'
@@ -92,7 +92,7 @@ const ProductsList = (props) => {
     );
 }
 
-export default EntityListPage({
+export default EntityCollectionPage({
     entityName: 'product',
     perPageOptions,
     filterStructure,

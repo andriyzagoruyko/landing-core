@@ -1,32 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { parseQuery, stringifyQuery } from '~/helpers/query';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { initializeFilter } from '~c/common/Filter';
 
 /* Actions */
-//import { readEntity, readEntities, removeEntities } from '~s/actionCreators/entity';
+import actions from '~s/ducks/page/operations';
+import entityActions from '~s/ducks/entity/operations';
 
 /* Selectors */
-//import { selectReadEntities, selectEntityStatus, selectEntitySingle } from '~s/selectors/entity';
-//import { selectMaxPages, selectTotal, selectViewType } from '~s/selectors/page';
+import entitySelectors from '~s/ducks/entity/selectors';
+import pageSelectors from '~s/ducks/page/selectors';
 
+/* Components */
 import Page404 from '~p/errors/e404';
+import Loader from '~c/Preloader';
 
-const Container = (WrapperComponent) => (props) => {
-    const {
-        history,
-        isFetching,
-        entityName,
-        entity,
-        readEntity,
-        readEntities,
-        relations,
-        match,
-        selectEntities,
-        selectEntityStatus,
-    } = props;
-
-    //const [queryId, setQueryId] = useState(0);
+const Container = (WrapperComponent) => ({
+    isError,
+    ...props
+}) => {
+    const { match } = props;
 
     useEffect(() => {
         const id = parseInt(match.params.id);
@@ -35,71 +26,26 @@ const Container = (WrapperComponent) => (props) => {
             readEntity(id);
         }
 
-        if (relations.length) {
-            relations.forEach(name => {
-                if (!selectEntities(name).length) {
-                    readEntities(name)
-                }
-            });
-        }
-
-        //return () => cleanEntities(entityName);
     }, []);
 
-
-    /*if (status.error || (limit && perPageOptions && !perPageOptions.includes(limit))) {
-        return <Page404 />
-    }*/
-
-    /*const data = {
-        [entityName]: entity
-    }*/
-
-
-    /* if (!isFetching && entity) {
-        isFetching = selectEntityStatus(entityName, queryId).isFetching;
-    }*/
-
-
-    console.log('isFetching', isFetching);
-
-    return (
-        <WrapperComponent entity={entity} {...props} />
-    );
+    return <WrapperComponent {...props} />
 }
 
-const getRelations = (state, relations) => {
-    let data = { isFetching: false };
 
-    relations.forEach(name => {
-        data[name] = selectReadEntities(state, name);
 
-        if (!data[name].length || selectEntityStatus(state, name).isFetching) {
-            data.isFetching = true;
-        }
-    });
-
-    return data;
-}
-
-const mapStateToProps = (entityName, { relations = [] }) => (state, props) => ({
-    selectEntities: (entityName) => selectReadEntities(state, entityName),
-    selectEntityStatus: (entityName, key) => selectEntityStatus(state, entityName, key),
-    entity: selectEntitySingle(state, entityName, parseInt(props.match.params.id)),
-    entities: selectReadEntities(state, entityName),
-    entityName,
-    relations,
-    ...getRelations(state, relations)
-});
-
-const mapDispatchToProps = entityName => (dispatch, props) => {
+const mapStateToProps = (entityName, hocParams) => (state, props) => {
     return {
-        readEntity: (params) => dispatch(readEntity(entityName, params)),
-        readEntities: (entityName) => dispatch(readEntities(entityName, '?page=1&limit=12')),
-        removeEntities: (ids) => dispatch(removeEntities(entityName, ids)),
-        cleanEntities: (entityName) => dispatch(cleanEntities(entityName))
+        getCollection: (entityName) => entitySelectors.getCollection(state, entityName, '?page=1&limit=12'),
+        getStatus: (entityName, key) => entitySelectors.getStatus(state, entityName, key),
+        entity: entitySelectors.getEntity(state, entityName, parseInt(props.match.params.id)),
     }
-};
+}
+
+const mapDispatchToProps = entityName => dispatch => ({
+    readEntity: (params) => dispatch(entityActions.readEntity(entityName, params)),
+    readEntities: (entityName) => dispatch(entityActions.eadEntities(entityName, '?page=1&limit=12')),
+    cleanEntitiesStatus: (entityName) => dispatch(entityActions.cleanEntitiesStatus(entityName))
+});
 
 export default ({ entityName, ...params }) => WrapperComponent => (
     connect(

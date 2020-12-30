@@ -24,6 +24,11 @@ const setFilterItems = (entityName, filters) => ({
     payload: filters
 });
 
+const setFiltersActive = (entityName, isActive) => ({
+    type: composeType(types.SET_FILTERS_ACTIVE, entityName),
+    payload: isActive
+});
+
 const setSelected = (entityName, selected) => ({
     type: composeType(types.SET_SELECTED, entityName),
     payload: selected,
@@ -44,14 +49,20 @@ const setActive = (entityName, isActive) => ({
     payload: isActive,
 });
 
+const setProcessing = (entityName, isActive) => ({
+    type: composeType(types.SET_PROCESSING, entityName),
+    payload: isActive,
+});
 
 export default {
     setPageProps,
     setViewType,
     setSearchKeyword,
     setFilterItems,
+    setFiltersActive,
     setSelected,
     setQuery,
     setStatus,
-    setActive
+    setActive,
+    setProcessing
 }

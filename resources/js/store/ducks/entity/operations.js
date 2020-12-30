@@ -38,32 +38,19 @@ const removeEntities = (entityName, ids) => async (dispatch, getState) => {
     }
 }
 
-const cleanEntitiesStatus = (entityName, exceptKey = '', withBiggerPage = true) => async (dispatch, getState) => {
+const cleanEntitiesStatus = (entityName, exceptKeys = [], updateKey) => async (dispatch, getState) => {
     const state = getState();
     const statuses = state.entities[entityName].status;
+    
+    const newStatuses = Object.fromEntries(
+        Object.entries(statuses).filter(([key]) => exceptKeys.includes(key))
+    );
 
-    let data = {};
-
-    if (exceptKey) {
-        const exceptStatus = statuses[exceptKey];
-
-        if (exceptStatus) {
-            data[exceptKey] = { ...exceptStatus, shouldUpdate: true }
-
-            if (withBiggerPage) {
-                Object.entries(statuses).forEach(([key, item]) => {
-                    const { page, limit } = item;
-
-                    if (Object.keys(item).length === Object.keys(exceptStatus).length
-                        && limit === exceptStatus.limit && page < exceptStatus.page) {
-                        data[key] = item;
-                    }
-                });
-            }
-        }
+    if (updateKey && newStatuses[updateKey]) {
+        newStatuses[updateKey].shouldUpdate = true;
     }
 
-    dispatch(actions.entitySetStatus(entityName, data));
+    dispatch(actions.entitySetStatus(entityName, newStatuses));
 }
 
 export default {
