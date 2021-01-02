@@ -1,19 +1,18 @@
 import { normalize } from 'normalizr';
 import { getEntitySchema } from '~s/ducks/schema';
-
+import { composeType } from '~s/ducks/helpers/';
 import types from '~s/ducks/entity/types';
 
 const normalizeMiddlewre = () => next => (action) => {
-    if (action.type && action.type.includes(types.FETCH_SUCCESS)) {
-        const schemaToNormalize = getEntitySchema(action.meta.entityName, action.meta.multiple)
+    if (action.type === composeType(types.FETCH, 'SUCCESS')) {
+        const schema = getEntitySchema(action.meta.entityName, action.request.multiple);
 
-        return next({
-            ...action,
-            payload: {
-                ...action.payload,
-                items: normalize(action.payload.items, schemaToNormalize)
-            },
-        });
+        const payload = {
+            ...action.payload,
+            items: normalize(action.payload.items, schema)
+        };
+
+        return next({ ...action, payload, });
     }
 
     return next(action);

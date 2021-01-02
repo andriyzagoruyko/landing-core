@@ -52,8 +52,9 @@ class ProductController extends Controller
                     $fileAdder->toMediaCollection('images');
                 });
         }
+        
 
-        return response()->json($product->fresh(), 201);
+        return response()->json(['items' => $product->fresh()], 201);
     }
 
     /**
@@ -65,7 +66,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         return [
-            'items' => [$product]
+            'items' => $product
         ];
     }
 

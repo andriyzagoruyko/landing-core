@@ -4,6 +4,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { routerMiddleware } from 'connected-react-router'
 import normalizeMiddleware from './middlewares/normalize'
 import pagesMiddleware from './middlewares/pages'
+import apiMiddleware from './middlewares/api'
 import thunk from 'redux-thunk';
 import logger from 'redux-logger'
 import rootReducer from '~s/ducks'
@@ -20,6 +21,7 @@ export default function configureStore() {
                 routerMiddleware(history),
                 normalizeMiddleware,
                 pagesMiddleware,
+                apiMiddleware,
                 thunk,
                 logger
             )

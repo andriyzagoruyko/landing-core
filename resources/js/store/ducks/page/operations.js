@@ -1,7 +1,6 @@
 import { push, replace } from 'connected-react-router';
 import { composeQuery, stringifyQuery } from '~/helpers/query'
 import { plural } from '~/helpers/plural';
-import { composeType } from '~s/ducks/helpers/';
 
 /* Actions */
 import { operations as notices } from '~s/ducks/notices'
@@ -11,9 +10,6 @@ import actions from './actions';
 import { selectors as entitySelectors } from '~s/ducks/entity';
 import { operations as entityActions } from '~s/ducks/entity';
 import selectors from './selectors';
-
-/* Types*/
-import { types as entityTypes } from '~s/ducks/entity';
 
 const setFilters = (entityName, filters) => actions.setFilterItems(entityName, filters);
 const setSearchKeyword = (entityName, filters) => actions.setSearchKeyword(entityName, filters);
@@ -34,22 +30,25 @@ const initializePage = (entityName, query, search, filterStructure, filterParams
     dispatch(actions.setFiltersActive(entityName, activeFilters || activeSearch));
 
     if (!status.result || status.shouldUpdate) {
-        dispatch(entityActions.readEntities(entityName, query));
+        dispatch(entityActions.readEntities(entityName, query, true));
     }
 }
 
-const changePage = (entityName, page, perPage = null, newQuery = '', method = push) => async (dispatch, getState) => {
+const changePage = (entityName, page, perPage = null, newQuery = '') => async (dispatch, getState) => {
     const state = getState();
     const currentQuery = selectors.getCurrentQuery(state);
-    const query = newQuery || currentQuery;
+    const limit = !perPage ? selectors.getLimit(state, entityName, currentQuery) : perPage;
+    const query = composeQuery(newQuery || currentQuery, { page, limit });
+    const status = entitySelectors.getStatus(state, entityName, query);
 
-    const limit = perPage === null
-        ? selectors.getLimit(state, entityName, currentQuery)
-        : perPage;
+    dispatch(push({ search: query }));
 
-    dispatch(method({
-        search: composeQuery(query, { page, limit })
-    }));
+    if (!status.result || status.shouldUpdate) {
+        await dispatch(entityActions.readEntities(entityName, query, true));
+        dispatch(actions.setSelected(entityName, []));
+    } else {
+        dispatch(actions.setSelected(entityName, []));
+    }
 }
 
 const updateStatuses = (entityName, query, newStatus) => async (dispatch, getState) => {
@@ -74,43 +73,32 @@ const updateStatuses = (entityName, query, newStatus) => async (dispatch, getSta
 const removeEntitiesFromPage = (entityName, ids) => async (dispatch, getState) => {
     const state = getState();
     const query = selectors.getCurrentQuery(state);
-    const count = {
-        current: entitySelectors.getCollectionCount(state, entityName, query),
-        remove: ids.length,
-        isCollection: ids.length > 1,
-    }
-    const newStatus = {
+    const currentCount = entitySelectors.getCollectionCount(state, entityName, query);
+    const currentPage = selectors.getPage(state, entityName, query);
+    const remove = { count: ids.length, single: ids.length === 1, pageEmpty: currentCount - ids.length <= 0 }
+    const nextQuery = remove.pageEmpty ? composeQuery(query, { page: Math.max(1, currentPage - 1) }) : query;
+
+    dispatch(setProcessing(entityName, true));
+    dispatch(updateStatuses(entityName, query, {
         total: selectors.getTotal(state, entityName, query) - 1,
-        maxPages: selectors.getMaxPages(state, entityName, query)
-    }
+        maxPages: selectors.getMaxPages(state, entityName, query) - (remove.pageEmpty ? 1 : 0)
+    }));
 
-    let page = selectors.getPage(state, entityName, query);
-    let newQuery = query;
-
-    if (count.current - count.remove <= 0) {
-        newStatus.maxPages = Math.max(1, newStatus.maxPages - 1)
-        newQuery = composeQuery(query, { page: Math.max(1, page - 1) });
-        dispatch(replace({ search: newQuery }));
-    }
-
-    dispatch(updateStatuses(entityName, query, newStatus));
-    dispatch(setProcessing(entityName, composeType(entityTypes.FETCH_SUCCESS, entityName)));
     await dispatch(entityActions.removeEntities(entityName, ids));
-    await dispatch(entityActions.readEntities(entityName, newQuery));
-    dispatch(notices.addNotice(`${count.remove} ${plural(entityName, count.remove)} has been removed`));
+    await dispatch(entityActions.readEntities(entityName, nextQuery, true));
 
-    if (count.isCollection) {
-        dispatch(actions.setSelected(entityName, []));
-    } else if (selectors.isSelected(state, entityName, ids[0])) {
-        dispatch(actions.selectEntity(entityName, ids[0]));
-    }
+    dispatch(replace({ search: nextQuery }))
+    dispatch(setProcessing(entityName, false));
+    dispatch(notices.addNotice(`${remove.count} ${plural(entityName, remove.count)} has been removed`));
+    dispatch(remove.single && selectors.isSelected(state, entityName, ids[0])
+        ? selectEntity(entityName, ids[0])
+        : actions.setSelected(entityName, []));
 }
 
 const confirmFilters = (entityName) => async (dispatch, getState) => {
     const state = getState();
     const search = selectors.getSearchKeyword(state, entityName);
     const filterItems = selectors.getFilters(state, entityName);
-
     let filterParams = {}, activeFilters = false, activeSearch = search.length > 0;
 
     Object.values(filterItems).forEach(({ active, name, value }) => {
@@ -129,10 +117,9 @@ const confirmFilters = (entityName) => async (dispatch, getState) => {
 
 const selectEntity = (entityName, id) => (dispatch, getState) => {
     const selected = selectors.getSelected(getState(), entityName);
-    dispatch(
-        actions.setSelected(entityName, !selected.includes(id)
-            ? [...selected].concat([id])
-            : selected.filter(i => i !== id))
+    dispatch(actions.setSelected(entityName, selected.includes(id)
+        ? selected.filter(i => i !== id)
+        : [...selected].concat([id]))
     );
 }
 

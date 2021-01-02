@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { composeType } from '~s/ducks/helpers';
+import { composeType, isValidAction } from '~s/ducks/helpers';
 import { types as entityTypes } from '~s/ducks/entity/';
 import types from './types.js';
 
@@ -15,41 +15,40 @@ const initialStatePage = {
 }
 
 const pageReducer = entityName => (state = initialStatePage, action) => {
- 
+    if (!isValidAction(entityName, action)) {
+        return state;
+    }
 
     switch (action.type) {
-        case composeType(entityTypes.FETCH_SUCCESS, entityName):
-            if (action.meta.multiple) {
-                return { ...state, lastQuery: action.params }
-            }
+        case composeType(entityTypes.FETCH, 'SUCCESS'):
+            return action.request.multiple && state.isActive
+                ? { ...state, lastQuery: action.request.params } : state
 
-            break;
-
-        case composeType(types.SET_PROPS, entityName):
+        case types.SET_PROPS:
             return { ...state, props: { ...state.props, ...action.payload } }
 
-        case composeType(types.SET_VIEWTYPE, entityName):
+        case types.SET_VIEWTYPE:
             return { ...state, viewType: action.payload }
 
-        case composeType(types.SET_SEARCH, entityName):
+        case types.SET_SEARCH:
             return { ...state, searchKeyword: action.payload }
 
-        case composeType(types.SET_FILTERS, entityName):
+        case types.SET_FILTERS:
             return { ...state, filters: action.payload }
 
-        case composeType(types.SET_FILTERS_ACTIVE, entityName):
+        case types.SET_FILTERS_ACTIVE:
             return { ...state, isFiltersActive: action.payload }
 
-        case composeType(types.SET_SELECTED, entityName):
+        case types.SET_SELECTED:
             return { ...state, selected: action.payload }
 
-        case composeType(types.SET_QUERY, entityName):
+        case types.SET_QUERY:
             return { ...state, lastQuery: action.payload }
 
-        case composeType(types.SET_ACTIVE, entityName):
+        case types.SET_ACTIVE:
             return { ...state, isActive: action.payload }
 
-        case composeType(types.SET_PROCESSING, entityName):
+        case types.SET_PROCESSING:
             return { ...state, processing: action.payload }
     }
 
@@ -58,34 +57,37 @@ const pageReducer = entityName => (state = initialStatePage, action) => {
 
 
 const statusReducer = entityName => (state = {}, action) => {
+    if (!isValidAction(entityName, action)) {
+        return state;
+    }
+
     switch (action.type) {
-        /*case composeType(types.FETCH, entityName):
+        /*case composeType(types.FETCH):
             return {
                 ...state,
-                [action.params]: { ...state[action.params], isFetching: true, error: null }
+                [action.request.params]: { ...state[action.request.params], isFetching: true, error: null }
             }
 */
-        case composeType(entityTypes.FETCH_SUCCESS, entityName):
-            if (action.meta.multiple) {
+        case composeType(entityTypes.FETCH, 'SUCCESS'):
+            if (action.request.multiple) {
                 return {
                     ...state,
-                    [action.params]: {
+                    [action.request.params]: {
                         maxPages: action.payload.maxPages,
                         total: action.payload.total,
-                        parsedParams: action.parsedParams
+                        parsedParams: action.parsed
                     }
                 }
             }
 
             break;
 
-        case composeType(types.SET_STATUS, entityName):
-            return { ...state, ...action.payload }
+        case types.SET_STATUS: return { ...state, ...action.payload }
 
         /*case composeType(entityTypes.FETCH_ERROR, entityName):
             return {
                 ...state,
-                [action.params]: { isFetching: false, error: action.error }
+                [action.request.params]: { isFetching: false, error: action.error }
             }*/
     }
 

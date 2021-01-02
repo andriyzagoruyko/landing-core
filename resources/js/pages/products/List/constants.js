@@ -2,7 +2,7 @@
 import React from 'react';
 import Aviability from './Aviability'
 
-export const tableStructure = (renderActionButtons) => [
+export const table = (renderActionButtons) => [
     {
         name: 'id',
         label: 'ID',
@@ -46,18 +46,26 @@ export const tableStructure = (renderActionButtons) => [
     }
 ]
 
-export const filterStructure = [
-    {
-        name: 'available',
-        label: 'Availability',
-        type: 'range',
-    },
+const perPageOptions = [12, 36, 60];
 
-    {
-        name: 'price',
-        label: 'Price',
-        type: 'range',
-    }
-]
+export const settings = {
+    entityName: 'product',
+    perPageOptions,
+    initialParams: { page: 1, limit: perPageOptions[0] },
+    paramsRestoreOnBack: true,
+    paramsRestoreAlways: ['limit'],
+    filterStructure: [
+        {
+            name: 'available',
+            label: 'Availability',
+            type: 'range',
+        },
+        {
+            name: 'price',
+            label: 'Price',
+            type: 'range',
+        }
+    ]
+}
 
-export const perPageOptions = [12, 36, 60];
+export default { table, settings }

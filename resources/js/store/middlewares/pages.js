@@ -15,6 +15,7 @@ const pagesMiddleware = (store) => next => (action) => {
         }
 
         if (action.type === '@@router/LOCATION_CHANGE') {
+
             const query = action.payload.location.search.replace('?', '');
 
             if (query) {
@@ -24,7 +25,6 @@ const pagesMiddleware = (store) => next => (action) => {
 
                 if (action.payload.action === 'PUSH' || action.payload.action === 'REPLACE') {
                     const status = entitySelectors.getStatus(state, entityName, query);
-
                     if (status && status.result) {
                         store.dispatch(actions.setQuery(entityName, query));
                     }

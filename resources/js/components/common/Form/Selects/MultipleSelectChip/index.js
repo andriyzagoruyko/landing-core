@@ -1,26 +1,7 @@
 import React, { useState } from 'react';
-import { FormControl, InputLabel, Select, MenuItem, Input, Chip } from '@material-ui/core/';
-import { makeStyles } from '@material-ui/core/styles';
 import { Field } from 'redux-form'
-
-const useStyles = makeStyles((theme) => ({
-    formControl: {
-        margin: theme.spacing(2),
-        fisplay: 'inline-flex',
-        minWidth: 400,
-        maxWidth: '100%',
-        [theme.breakpoints.down('xs')]: {
-            width: '100%'
-        },
-    },
-    chips: {
-        display: 'flex',
-        flexWrap: 'wrap',
-    },
-    chip: {
-        margin: theme.spacing(1),
-    },
-}));
+import { FormControl, InputLabel, Select, MenuItem, Input, Chip } from '@material-ui/core/';
+import useStyles from './styles';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

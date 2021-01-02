@@ -1,47 +1,36 @@
-import { request } from '~/api/api.js';
-import { parseQuery } from '~/helpers/query'
 import actions from './actions';
+import type from './types';
+import { composeType } from '~s/ducks/helpers';
 
-const readEntity = (entityName, id) => async dispatch => {
-    try {
-        dispatch(actions.entityFetch(entityName, id));
-        const result = await request('GET', entityName, id, false);
-        dispatch(actions.entityFetchSuccess(entityName, result, id, false));
-        return result;
-    } catch (e) {
-        dispatch(actions.entityFetchError(entityName, id, false));
-    }
-}
+const api = (entityName, type, request) => dispatch => new Promise((resolve, reject) => {
+    dispatch({
+        type: composeType(type),
+        meta: { entityName },
+        promise: { resolve, reject },
+        request,
+    });
+});
 
-const readEntities = (entityName, params) => async (dispatch, getState) => {
-    const parsedParams = parseQuery(params);
+const readEntities = (entityName, params, multiple = false) => dispatch => (
+    dispatch(api(entityName, type.FETCH, { multiple, params }))
+);
 
-    try {
-        dispatch(actions.entityFetch(entityName, params, true));
-        const result = await request('GET', entityName, params, true);
-        dispatch(actions.entityFetchSuccess(entityName, result, params, parsedParams, true));
-        return result;
-    } catch (e) {
-        console.log(e);
-        dispatch(actions.entityFetchError(entityName, params, true));
-    }
-}
+const removeEntities = (entityName, ids) => async dispatch => (
+    dispatch(api(entityName, type.DELETE, { multiple: ids.length > 1, params: ids }))
+);
 
-const removeEntities = (entityName, ids) => async (dispatch, getState) => {
-    try {
-        dispatch(actions.entityDelete(entityName, ids));
-        await request('DELETE', entityName, ids, ids.length > 1);
-        dispatch(actions.entityDeleteSuccess(entityName, ids));
-    } catch (e) {
-        console.log(e);
-        dispatch(actions.entityDeleteError(entityName, ids));
-    }
-}
+const createEntity = (entityName, key, data) => async dispatch => (
+    dispatch(api(entityName, type.CREATE, { params: key, data }))
+);
+
+const updateEntity = (entityName, id, data) => async dispatch => (
+    dispatch(api(entityName, type.UPDATE, { params: id, data }))
+);
 
 const cleanEntitiesStatus = (entityName, exceptKeys = [], updateKey) => async (dispatch, getState) => {
     const state = getState();
     const statuses = state.entities[entityName].status;
-    
+
     const newStatuses = Object.fromEntries(
         Object.entries(statuses).filter(([key]) => exceptKeys.includes(key))
     );
@@ -50,12 +39,13 @@ const cleanEntitiesStatus = (entityName, exceptKeys = [], updateKey) => async (d
         newStatuses[updateKey].shouldUpdate = true;
     }
 
-    dispatch(actions.entitySetStatus(entityName, newStatuses));
+    dispatch(actions.setStatus(entityName, newStatuses));
 }
 
 export default {
-    readEntity,
+    createEntity,
     readEntities,
+    updateEntity,
     removeEntities,
     cleanEntitiesStatus
 }

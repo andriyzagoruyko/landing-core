@@ -17,7 +17,7 @@ const Container = (WrapperComponent) => ({
     isError,
     ...props
 }) => {
-    const { match } = props;
+    const { match, entity, readEntity } = props;
 
     useEffect(() => {
         const id = parseInt(match.params.id);
@@ -25,25 +25,19 @@ const Container = (WrapperComponent) => ({
         if (id && !entity) {
             readEntity(id);
         }
-
     }, []);
 
     return <WrapperComponent {...props} />
 }
 
-
-
 const mapStateToProps = (entityName, hocParams) => (state, props) => {
     return {
-        getCollection: (entityName) => entitySelectors.getCollection(state, entityName, '?page=1&limit=12'),
-        getStatus: (entityName, key) => entitySelectors.getStatus(state, entityName, key),
         entity: entitySelectors.getEntity(state, entityName, parseInt(props.match.params.id)),
     }
 }
 
 const mapDispatchToProps = entityName => dispatch => ({
     readEntity: (params) => dispatch(entityActions.readEntity(entityName, params)),
-    readEntities: (entityName) => dispatch(entityActions.eadEntities(entityName, '?page=1&limit=12')),
     cleanEntitiesStatus: (entityName) => dispatch(entityActions.cleanEntitiesStatus(entityName))
 });
 

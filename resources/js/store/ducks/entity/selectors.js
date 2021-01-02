@@ -14,8 +14,11 @@ const getStatus = (state, entityName, key) => (
 
 const getEntity = (state, entityName, id) => {
     if (id) {
-        return state.entities[entityName].data
-            .find(ent => ent.id === id);
+        return denormalize(
+            state.entities[entityName].data[id],
+            getEntitySchema(entityName, true),
+            getEntitiesForDenormalization(state),
+        );
     }
 }
 

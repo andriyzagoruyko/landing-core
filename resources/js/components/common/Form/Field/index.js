@@ -2,24 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { Field } from 'redux-form'
 import { TextField } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-    textField: {
-        margin: theme.spacing(2),
-        [theme.breakpoints.down('xs')]: {
-            flexGrow: 1,
-        },
-    },
-    textFieldGrow: {
-        flexGrow: 1,
-    },
-    helperText: {
-        position: 'absolute',
-        bottom: -5,
-        transform: 'translateY(100%)'
-    },
-}));
+import useStyles from './styles';
 
 const renderTextField = (props) => {
     const {

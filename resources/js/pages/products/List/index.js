@@ -1,10 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
-import { filterStructure, tableStructure, perPageOptions } from './constants'
-import EntityCollectionPage from '~/hocs/EntityCollectionPage';
-import PageList from '~c/common/List'
-import useTitle from '~/hooks/useTitle';
-import ActionsButtons from '~c/common/List/ActionsButtons'
+import { urlBuilder } from '~/routes'
+import constants from './constants';
+import EntityListContainer from '~/hocs/Containers/EntityList';
+import EntityList from '~c/common/List';
 import ProductCard from './Card'
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const ProductsList = (props) => {
     const {
@@ -27,15 +29,22 @@ const ProductsList = (props) => {
         removeEntitiesFromPage,
         selectEntity,
         selectMultiple,
+        perPageOptions,
+        push
     } = props;
 
-    useTitle(props.title);
-
     const renderActionButtons = useCallback(id => {
-        return <ActionsButtons
-            onRemove={() => removeEntitiesFromPage([id])}
-            onEdit={() => { }}
-        />
+        return (
+            <>
+                <IconButton size="small" aria-label="edit" onClick={() => push(urlBuilder('productsEdit', { id }))}>
+                    <EditIcon color="primary" />
+                </IconButton>
+                
+                <IconButton size="small" aria-label="edit" onClick={() => removeEntitiesFromPage([id])} >
+                    <DeleteIcon color="secondary" />
+                </IconButton>
+            </>
+        );
     }, [entities]);
 
     const renderCard = useCallback(item => (
@@ -48,10 +57,10 @@ const ProductsList = (props) => {
         />
     ), [entities, selected]);
 
-    const tableColumns = useMemo(() => tableStructure(renderActionButtons), [entities]);
+    const tableColumns = useMemo(() => constants.table(renderActionButtons), [entities]);
 
     return (
-        <PageList
+        <EntityList
             checkbox
             entityName="products"
             entities={entities}
@@ -82,7 +91,7 @@ const ProductsList = (props) => {
                 onSubmit: confirmFilters
             }}
             paginationProps={{
-                perPageOptions: perPageOptions,
+                perPageOptions,
                 onChangePage: (e, newPage) => changePage(newPage, limit),
                 onChangePerPage: (e) => changePage(1, parseInt(e.target.value, 10)),
             }}
@@ -92,14 +101,4 @@ const ProductsList = (props) => {
     );
 }
 
-export default EntityCollectionPage({
-    entityName: 'product',
-    perPageOptions,
-    filterStructure,
-    initialParams: {
-        page: 1,
-        limit: perPageOptions[0]
-    },
-    restoreOnBack: true,
-    restoreAlways: ['limit']
-})(ProductsList);
+export default EntityListContainer(constants.settings)(ProductsList);

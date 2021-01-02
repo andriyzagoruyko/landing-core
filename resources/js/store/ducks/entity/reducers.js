@@ -1,49 +1,64 @@
 import { combineReducers } from 'redux';
-import { composeType } from '~s/ducks/helpers';
+import { composeType, isValidAction } from '~s/ducks/helpers';
 import types from './types.js';
 
 const dataReducer = entityName => (state = {}, action) => {
-    if (action.type.startsWith(types.FETCH_SUCCESS)) {
-        if (!action.payload.items.entities[entityName]) {
-            return state;
-        }
+    if (!isValidAction(entityName, action)) {
+        return state;
+    }
 
-        return { ...state, ...action.payload.items.entities[entityName] }
+    switch (action.type) {
+        case composeType(types.FETCH, 'SUCCESS'):
+            if (!action.payload.items.entities[entityName]) {
+                return state;
+            }
+            return { ...state, ...action.payload.items.entities[entityName] }
+
+        case composeType(types.UPDATE, 'SUCCESS'):
+            return { ...state, [action.request.params]: action.payload }
+
+        case composeType(types.CREATE, 'SUCCESS'):
+            return { ...state, [action.request.params]: action.payload }
     }
 
     return state;
 }
 
 const statusReducer = entityName => (state = {}, action) => {
-    switch (action.type) {
-        case composeType(types.FETCH, entityName):
+    if (!isValidAction(entityName, action)) {
+        return state;
+    }
+
+    if (action.type === types.SET_STATUS) {
+        return action.payload;
+    }
+
+    if (action.request) {
+        const { type } = action;
+        const { params } = action.request;
+
+        if (type.includes('_REQUEST')) {
+            return { ...state, [params]: { ...state[params], isFetching: true, error: null } }
+        }
+
+        if (type.includes('_SUCCESS')) {
+            const { payload } = action;
+            const { result } = payload && payload.items && payload.items.result
+                ? payload.items : state[params];
+
             return {
                 ...state,
-                [action.params]: { ...state[action.params], isFetching: true, error: null }
+                [params]: { ...state[params], isFetching: false, shouldUpdate: false, error: null, result }
             }
+        }
 
-        case composeType(types.FETCH_SUCCESS, entityName):
-            return {
-                ...state,
-                [action.params]: {
-                    isFetching: false,
-                    error: null,
-                    result: action.payload.items.result,
-                }
-            }
-
-        case composeType(types.FETCH_ERROR, entityName):
-            return {
-                ...state, [action.params]: { isFetching: false, error: action.error }
-            }
-
-        case composeType(types.SET_STATUS, entityName):
-            return action.payload
+        if (type.includes('_ERROR')) {
+            return { ...state, [params]: { ...state[params], isFetching: false, error: action.error } }
+        }
     }
 
     return state;
 }
-
 
 const getReducers = entityName => (
     combineReducers({

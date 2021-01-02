@@ -6,7 +6,7 @@ const products = new schema.Array(product);
 const category = new schema.Entity('category');
 const categories = new schema.Array(category);
 
-const entitySchema = {
+export const entitySchema = {
     product,
     products,
     category,

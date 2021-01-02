@@ -3,9 +3,15 @@ import Page404 from '~p/errors/e404';
 import Home from '~p/home';
 import ProductList from '~p/products/List';
 import ProductForm from '~p/products/Form/';
+import CategoriesList from '~p/categories/List';
 import HomeIcon from '@material-ui/icons/Home';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { matchPath, generatePath } from "react-router-dom";
+
+import ListPageCreator from '~p/entity/ListPageCreator';
+
+import ProductsPageList from '~p/entity/Products/List';
+
 
 export const routes = {
     home: {
@@ -19,9 +25,10 @@ export const routes = {
         name: 'products',
         title: 'Products',
         path: '/products',
-        component: ProductList,
+        component: ListPageCreator(ProductsPageList),
         exact: true,
     },
+
     productsAdd: {
         name: 'productsAdd',
         title: 'Add product',
@@ -32,8 +39,15 @@ export const routes = {
     productsEdit: {
         name: 'productsEdit',
         title: 'Edit product',
-        path: '/products/:id',
+        path: '/products/:id(\\d+)',
         component: ProductForm,
+        exact: true,
+    },
+    categories: {
+        name: 'categories',
+        title: 'Categories',
+        path: '/categories',
+        component: CategoriesList,
         exact: true,
     },
     notFound: {
@@ -58,6 +72,11 @@ export const navList = [
             {
                 label: 'Products',
                 to: '/products',
+                exact: false,
+            },
+            {
+                label: 'Categories',
+                to: '/categories',
                 exact: false,
             }
         ]
