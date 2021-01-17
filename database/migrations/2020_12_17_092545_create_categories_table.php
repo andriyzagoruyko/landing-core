@@ -18,6 +18,7 @@ class CreateCategoriesTable extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->timestamps();
+            $table->nestedSet();
         });
     }
 

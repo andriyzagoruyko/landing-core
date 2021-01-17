@@ -7,28 +7,32 @@ use Illuminate\Http\Request;
 use App\Filters\CategoryFilter;
 use App\Http\Controllers\Controller;
 
-class CategoryController extends Controller
+class CategoryController extends EntityController
 {
+    protected $model = 'App\Models\Category';
+
+    protected $load = [
+        'media', 
+        'parent',
+        'children.media'
+    ];
+
+    protected $dataTypes = [
+        'children' => 'array', 
+    ];
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(CategoryFilter $filter)
+    public function index(Request $request)
     {
-        $limit = $filter->request->has('limit') ? $filter->request->limit : 12;
-        $query = Category::filter($filter);
-        $paginate = $query->orderBy('id', 'DESC')->paginate($limit);
+        if (!$request->has('root')) {
+            return $this->paginate($request);
+        } 
 
-        if ($limit > 100 || $paginate->currentPage() > $paginate->lastPage()) {
-            return response()->json('Not found', 404);
-        }
-
-        return [
-            "total" => $paginate->total(),
-            "maxPages" => $paginate->lastPage(),
-            "items" => $paginate->items(),
-        ];
+        return $this->response(Category::get()->toTree());
     }
 
     /**
@@ -39,18 +43,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
+        $category = $this->updateOrCreate($request);
 
-        $category = Category::create($data);
-
-        if ($request->hasFile('images')) {
-            $category->addMultipleMediaFromRequest(['images'])
-                ->each(function ($fileAdder) {
-                    $fileAdder->toMediaCollection('images');
-                });
-        }
-
-        return response()->json($category->fresh(), 201);
+        return $this->responseWithLoad($category, 201);
     }
 
     /**
@@ -61,9 +56,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return [
-            'items' => $category
-        ];
+        return $this->responseWithLoad($category);
     }
 
     /**
@@ -75,7 +68,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $category = $this->updateOrCreate($request, $category);
+
+        return $this->response($category, 201);
     }
 
     /**
@@ -86,8 +81,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        $category->delete();
+        $this->delete($category);
 
-        return response()->json(null, 204);
+        return response(null, 204);
     }
 }

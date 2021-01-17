@@ -6,6 +6,6 @@ class CategoryFilter extends QueryFilter
 {
     public function search($keyword)
     {
-        return $this->builder->Where('title', 'like', '%'.$keyword.'%');
+        return $this->searchByFields($keyword, ['title']);
     }
 }

@@ -4,10 +4,10 @@ import { Route, Switch } from 'react-router-dom';
 import { routes } from '~/routes';
 import { CssBaseline, Container } from '@material-ui/core/';
 import useStyles from './styles'
-import Header from '~c/Header';
-import Notices from '~c/Notices';
-import Breadcrumbs from '~c/Breadcrumbs';
-import Loader from '~c/Preloader';
+import Header from '~c/app/Header';
+import Notifier from '~c/app/Notifier';
+import Breadcrumbs from '~c/app/Breadcrumbs';
+import Loader from '~c/common/Preloader';
 
 const App = (props) => {
     const classes = useStyles();
@@ -27,7 +27,7 @@ const App = (props) => {
             <CssBaseline />
             <div className={classes.root}>
                 <Header />
-                <Notices />
+                <Notifier />
                 <Container className={classes.container} maxWidth={false}>
                     {props.isLoading && <Loader />}
                     <div className={classes.toolbar} />

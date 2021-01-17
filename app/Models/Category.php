@@ -2,32 +2,71 @@
 
 namespace App\Models;
 
-use App\Filters\QueryFilter;
+use App\Traits\HasFilter;
+use App\Traits\ImageGallery;
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Builder;
+use Kalnoy\Nestedset\NodeTrait;
 
-class Category extends Model
+class Category extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, ImageGallery, HasFilter, NodeTrait;
+    
+    /**
+     * Disable snake case attributes.
+     *
+     * @var bool
+     */
+    public static $snakeAttributes = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'title', 
+        'description', 
+        'parent_id'
+    ];
+
+    /**
+     * The attributes that should be visible in arrays.
+     *
+     * @var array
+     */
+    protected $visible = [
+        'id', 
+        'title', 
+        'description', 
+        'images',
+        'parent_id',
+        'children',
+        'type'
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'images',
+        'type'
+    ];
+    
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function products()
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(Product::class)->with('media');
     }
 
-    /**
-     * Apply the scope to filter by params.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \App\Filters\QueryFilter $filters
-     * @return Builder
-     */
-    public function scopeFilter(Builder $builder, QueryFilter $filters)
+    public function getTypeAttribute() 
     {
-        return $filters->apply($builder);
+        return 'category';
     }
 }

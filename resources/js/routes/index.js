@@ -1,17 +1,9 @@
-import React from 'react';
-import Page404 from '~p/errors/e404';
-import Home from '~p/home';
-import ProductList from '~p/products/List';
-import ProductForm from '~p/products/Form/';
-import CategoriesList from '~p/categories/List';
-import HomeIcon from '@material-ui/icons/Home';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { matchPath, generatePath } from "react-router-dom";
-
-import ListPageCreator from '~p/entity/ListPageCreator';
-
-import ProductsPageList from '~p/entity/Products/List';
-
+import { getEntityRoutes } from './entity';
+import Home from '~p/home';
+import Page404 from '~p/errors/e404';
+import products from '~p/entity/Products/';
+import categories from '~p/entity/Categories/';
 
 export const routes = {
     home: {
@@ -21,35 +13,12 @@ export const routes = {
         component: Home,
         exact: true
     },
-    products: {
-        name: 'products',
-        title: 'Products',
-        path: '/products',
-        component: ListPageCreator(ProductsPageList),
-        exact: true,
-    },
 
-    productsAdd: {
-        name: 'productsAdd',
-        title: 'Add product',
-        path: '/products/add',
-        component: ProductForm,
-        exact: true,
-    },
-    productsEdit: {
-        name: 'productsEdit',
-        title: 'Edit product',
-        path: '/products/:id(\\d+)',
-        component: ProductForm,
-        exact: true,
-    },
-    categories: {
-        name: 'categories',
-        title: 'Categories',
-        path: '/categories',
-        component: CategoriesList,
-        exact: true,
-    },
+    ...getEntityRoutes([
+        products,
+        categories
+    ]),
+
     notFound: {
         name: 'notFound',
         title: 'Page not found',
@@ -58,46 +27,18 @@ export const routes = {
     }
 }
 
-export const navList = [
-    {
-        label: 'Main page',
-        to: '/',
-        exact: true,
-        icon: <HomeIcon color="primary" />
-    },
-    {
-        label: 'Store',
-        icon: <ShoppingCartIcon color="primary" />,
-        submenu: [
-            {
-                label: 'Products',
-                to: '/products',
-                exact: false,
-            },
-            {
-                label: 'Categories',
-                to: '/categories',
-                exact: false,
-            }
-        ]
-    }
-];
-
-export const routesMatch = (routePath, url, exact = true) => {
-    const match = matchPath(url, {
-        path: routePath,
-        exact
-    });
-
+export const routesMatch = (path, url, exact = true) => {
+    const match = matchPath(url, { path, exact });
     return (match != null && match.params) != false
 }
 
-export const getRouteByUrl = url => Object.values(routes).find(route => routesMatch(route.path, url)) || {};
+export const getRouteByUrl = url => (
+    Object.values(routes).find(route => routesMatch(route.path, url)) || {}
+);
 
-export const urlBuilder = (name, params) => {
-    return routes.hasOwnProperty(name)
-        ? generatePath(routes[name].path, params)
-        : null;
-}
+export const urlBuilder = (name, params) => routes.hasOwnProperty(name)
+    ? generatePath(routes[name].path, params)
+    : null;
 
+export { default as navList } from './navigation';
 export default routes;

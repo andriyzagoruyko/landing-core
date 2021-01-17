@@ -32,10 +32,12 @@
         "@material-ui/data-grid": "^4.0.0-alpha.10",
         "@material-ui/icons": "^4.9.1",
         "@material-ui/lab": "^4.0.0-alpha.57",
+        "@reduxjs/toolkit": "^1.5.0",
         "classnames": "^2.2.6",
         "connected-react-router": "^6.8.0",
         "material-ui-dropzone": "^3.5.0",
         "normalizr": "^3.6.1",
+        "notistack": "^1.0.3",
         "prop-types": "^15.7.2",
         "query-string": "^6.13.7",
         "react-redux": "^7.2.2",
@@ -44,6 +46,7 @@
         "redux-devtools-extension": "^2.13.8",
         "redux-form": "^8.3.7",
         "redux-thunk": "^2.3.0",
+        "redux-toolkit": "^1.1.2",
         "uuid": "^8.3.2"
     }
 }

@@ -6,7 +6,14 @@ import { createFileFromUrl, readFile } from './helpers';
 import theme from './theme';
 
 const renderDropZone = (props) => {
-    const { input, meta, ...custom } = props;
+    const {
+        input,
+        meta,
+        acceptedFiles = ['image/*'],
+        dropzoneText = "Drag and drop an image or click",
+        ...custom
+    } = props;
+
     const [files, setFiles] = React.useState([]);
     const [dragIndex, setDragIndex] = React.useState(null);
 
@@ -60,16 +67,17 @@ const renderDropZone = (props) => {
 
     const getPreviewIcon = (fileObject, classes) => {
         const { data, file } = fileObject;
-
         const index = files.findIndex(f => f.file.name === file.name);
-
-        return <img
-            src={data}
-            className={classes.image}
-            alt=""
-            onDrag={() => handleDrag(index)}
-            onDrop={() => handleDrop(index)}
-        />
+        
+        return (
+            <img
+                src={data}
+                className={classes.image}
+                alt=""
+                onDrag={() => handleDrag(index)}
+                onDrop={() => handleDrop(index)}
+            />
+        )
     }
 
     return (
@@ -81,6 +89,8 @@ const renderDropZone = (props) => {
                     onDelete={(file, index) => handleDelete(file, index)}
                     getPreviewIcon={getPreviewIcon}
                     showPreviewsInDropzone={false}
+                    acceptedFiles={acceptedFiles}
+                    dropzoneText={dropzoneText}
                     showPreviews
                     {...custom}
                 />
@@ -89,14 +99,6 @@ const renderDropZone = (props) => {
     );
 }
 
-const Upload = (props) => {
-    return (
-        <Field
-            component={renderDropZone}
-            {...props}
-        />
-    );
-}
-
+const Upload = (props) => <Field component={renderDropZone} {...props} />
 
 export default Upload;

@@ -57,18 +57,12 @@ const Search = ({ show = true, value, placeholder, active, onChange, onSearch, .
                 {...rest}
             />
             {(active || value.length) ? (
-                <IconButton
-                    className={classes.searchButton}
-                    onClick={handleClicReset}
-                >
+                <IconButton className={classes.searchButton} onClick={handleClicReset}>
                     <ClearIcon />
                 </IconButton>
             ) : null}
 
-            <IconButton
-                className={classes.searchButton}
-                onClick={handleClickSearch}
-            >
+            <IconButton className={classes.searchButton} onClick={handleClickSearch} >
                 <SearchIcon />
             </IconButton>
         </Paper>
@@ -84,6 +78,7 @@ Search.propTypes = {
 };
 
 Search.defaultProps = {
+    value: '',
     onChange: () => { },
     onSearch: () => { }
 };

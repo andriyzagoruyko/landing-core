@@ -20,14 +20,20 @@ const theme = createMuiTheme({
                 width: '100%',
                 display: 'flex',
                 flexWrap: 'nowrap',
-                overflow: "auto"
+                overflow: "auto",
             },
             imageContainer: {
-                flex: '0 0 33.333333%',
-                maxWidth: 250
+                maxWidth: 250,
+                flex: '0 0 auto',
+                padding: `${defaultTheme.spacing(2)}px !important`,
+                [defaultTheme.breakpoints.down('md')]: {
+                    padding: `${defaultTheme.spacing(1)}px !important`,
+                    marginLeft: defaultTheme.spacing(1)
+                },
             },
             image: {
-                objectFit: 'contain'
+                objectFit: 'contain',
+                maxHeight: '100%',
             }
         }
     }

@@ -26,7 +26,8 @@ const renderCheckbox = ({ input, label, meta, onChange, children, ...rest }) => 
                 }
                 {...rest}
             />
-            <Fade in={input.value ? true : false}>
+            
+            <Fade in={input.value ? true : false} unmountOnExit>
                 <FormGroup row >
                     {children}
                 </FormGroup>

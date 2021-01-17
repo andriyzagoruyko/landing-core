@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import { TextField, IconButton, FormControl } from '@material-ui/core/';
 import CheckIcon from '@material-ui/icons/Check';
@@ -61,5 +62,11 @@ const FilterRange = ({ label, value, onSubmit }) => {
         </FormControl>
     )
 }
+
+FilterRange.propTypes = {
+    value: PropTypes.array.isRequired,
+    label: PropTypes.string.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+};
 
 export default FilterRange;

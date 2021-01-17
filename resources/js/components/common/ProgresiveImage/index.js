@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
-const useStyles = (aspectRatio) => makeStyles(theme => ({
+const useStyles = (aspectRatio) => makeStyles({
     container: {
         position: 'relative',
         overflow: 'hidden',
-        background: 'rgba(0, 0, 0, 0.05)',
+        //background: 'rgba(0, 0, 0, 0.05)',
         paddingBottom: `${aspectRatio}%`
     },
     image: {
@@ -15,56 +16,40 @@ const useStyles = (aspectRatio) => makeStyles(theme => ({
         left: 0,
         width: '100%',
         height: '100%',
-    },
-    placeholder: {
-        transition: 'visibility 0ms ease 400ms'
-    },
-    full: {
         transition: 'opacity 400ms ease 0ms'
-    }
-}));
+    },
+});
 
-/*
-          <img
-                {...props}
-                src={placeholder}
-                className={clsx(classes.image, classes.placeholder)}
-                style={{ visibility: isLoaded ? "hidden" : "visible" }}
-            />
-            */
+const ResponsiveImage = ({ width, height, src, srcSet, ...props }) => {
+    const [sizes, setSizes] = useState(null);
+    const classes = useStyles(height / width * 100)();
 
-const ResponsiveImage = ({ width, height, src, srcSet, placeholder, ...props }) => {
-    const ref = React.useRef();
-    const [sizes, setSizes] = React.useState('1px');
-    const [isLoaded, setIsLoaded] = React.useState(false);
-    const aspectRatio = (height / width) * 100;
-    const classes = useStyles(aspectRatio)();
-
-    const handleLoad = () => {
-        if (!isLoaded) {
-            setSizes(Math.ceil(ref.current.getBoundingClientRect().width / window.innerWidth * 100) + 'vw');
-            setIsLoaded(true);
-        }
-    }
+    const handleLoad = ({ target }) => !sizes && setSizes(
+        Math.ceil(target.getBoundingClientRect().width / window.innerWidth * 100) + 'vw'
+    );
 
     return (
-        <div
-            ref={ref}
-            className={classes.container}
-            style={{ paddingBottom: `${aspectRatio}%` }}
-        >
+        <div className={classes.container}>
             <img
-                {...props}
-                sizes={sizes}
+                sizes={sizes ? sizes : '1px'}
                 src={src}
                 srcSet={srcSet}
                 className={clsx(classes.image, classes.full)}
-                style={{ opacity: isLoaded ? 1 : 0 }}
+                style={{ opacity: sizes ? 1 : 0 }}
                 onLoad={handleLoad}
+                {...props}
             />
         </div>
     );
 }
+
+ResponsiveImage.propTypes = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+    src: PropTypes.string,
+    srcSet: PropTypes.string,
+    progressProps: PropTypes.object
+};
 
 export default ResponsiveImage;
 

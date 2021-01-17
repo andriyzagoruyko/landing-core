@@ -22,7 +22,7 @@ class CreateProductsTable extends Migration
             $table->unsignedTinyInteger('sale')->default(0);
             $table->dateTime('saleExpires')->nullable();
             $table->boolean('saleEnabled')->default(false);
-            $table->integer('available')->default(-1);
+            $table->integer('available')->nullable();
             $table->timestamps();
         });
     }

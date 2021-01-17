@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { Field } from 'redux-form'
 import { TextField } from '@material-ui/core';
@@ -21,21 +22,23 @@ const renderTextField = (props) => {
     );
 }
 
-const FormField = ({ grow = true, ...rest }) => {
+const FormField = ({ grow = false, ...rest }) => {
     const classes = useStyles();
+
     return (
         <Field
             {...rest}
             component={renderTextField}
-            FormHelperTextProps={
-                { className: classes.helperText }
-            }
             variant="outlined"
             margin="normal"
+            FormHelperTextProps={{ className: classes.helperText }}
             className={clsx(classes.textField, grow ? classes.textFieldGrow : null)}
         />
     );
 }
 
+FormField.propTypes = {
+    grow: PropTypes.bool,
+};
 
 export default FormField;

@@ -7,11 +7,9 @@ use Illuminate\Http\Request;
 
 abstract class QueryFilter
 {
-    public $request;
+    protected $request, $builder;
 
-    protected $builder;
-
-    protected $delimiter = ',';
+    protected $delimiter = ';';
 
     public function __construct(Request $request)
     {
@@ -24,7 +22,7 @@ abstract class QueryFilter
 
         foreach ($this->filters() as $name => $value) {
             if (method_exists($this, $name)) {
-                call_user_func_array([$this, $name], array_filter([$value]));
+                call_user_func_array([$this, $name], array_filter([$value, $name]));
             }
         }
 
@@ -41,14 +39,28 @@ abstract class QueryFilter
         return explode($this->delimiter, $param);
     }
 
-    protected function filterRange($name, $arrayRange) {
-        if (isset($arrayRange[0])) {
-            $this->builder->where($name, '>=', $arrayRange[0]);
+    protected function filterByRange($param, $name) {
+        $array = $this->paramToArray($param);
+
+        if (isset($array[0])) {
+            $this->builder->where($name, '>=', $array[0]);
         }
 
-        if (isset($arrayRange[1])) {
-            $this->builder->where($name, '<=', $arrayRange[1]);
+        if (isset($array[1])) {
+            $this->builder->where($name, '<=', $array[1]);
         }
+
+        return $this->builder;
+    }
+
+    public function searchByFields($keyword, $fields)
+    {
+        $this->builder->Where(function($query) use ($fields, $keyword)
+        {
+            foreach($fields as $field) {
+                $query->orWhere( $field, 'like', '%'.$keyword.'%');
+            }
+        });
 
         return $this->builder;
     }

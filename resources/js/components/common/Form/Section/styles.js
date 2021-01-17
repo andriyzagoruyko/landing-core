@@ -23,7 +23,8 @@ export default makeStyles((theme) => ({
         display: 'flex',
         flexWrap: 'wrap',
         flex: '1 1 100%',
-        width: '100%'
+        width: '100%',
+        margin: `${theme.spacing(2)}px 0`
     },
 
     divider: {

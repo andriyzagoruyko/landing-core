@@ -21,11 +21,9 @@ const MenuProps = {
     },
 };
 
-const renderSelect = ({ input, label, meta, onChange, items = [], emptyText = "Not selected", ...rest }) => {
+const renderSelect = ({ input, label, meta, onChange, items = [], emptyText = "Not selected", listItems, ...rest }) => {
     const classes = useStyles();
     let itemsTitle = {};
-    
-    console.log(itemsTitle);
 
     items.forEach(item => itemsTitle[item.id] = item.title);
 
@@ -65,11 +63,14 @@ const renderSelect = ({ input, label, meta, onChange, items = [], emptyText = "N
                 MenuProps={MenuProps}
                 {...rest}
             >
-                {items.length && items.map(({ id, title }) => (
-                    <MenuItem key={title} value={id} >
-                        {title}
-                    </MenuItem>
-                ))}
+                {!listItems
+                    ? items.length && items.map(({ id, title }) => (
+                        <MenuItem key={title} value={id} >
+                            {title}
+                        </MenuItem>
+                    ))
+                    : listItems
+                }
             </Select>
         </FormControl>
     )

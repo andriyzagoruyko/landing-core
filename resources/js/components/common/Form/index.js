@@ -5,4 +5,5 @@ export { default as CheckboxField } from './CheckboxField';
 export { default as Upload } from './Upload';
 export { default as Button } from './Button';
 export { default as MultipleSelectChip } from './Selects/MultipleSelectChip';
-export { default as EntityMultipleSelect } from './Selects/EntityMultipleSelect';
+export { default as Chips } from './Chips';
+

@@ -1,37 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { TableBody, TableCell, TableRow, Checkbox } from '@material-ui/core/';
+import * as types from '../proptypes';
 
-const CustomTableBody = ({ columns, rows, selectedRows, checkbox, onSelect }) => {
+const CustomTableBody = ({ columns, rows, checkboxProps }) => {
     const handleClickRow = ({ target }, id) => {
-        if (checkbox && target.tagName === 'TD') {
-            onSelect(id);
+        if (Boolean(checkboxProps) && target.tagName === 'TD') {
+            checkboxProps.onChange(id);
         }
     }
 
-
     return (
         <TableBody>
-            {Object.values(rows).map(row => (
-                <TableRow hover key={row.id} onClick={(e) => handleClickRow(e, row.id)}>
-                    {checkbox && (
+            {rows.map(row => (
+                <TableRow hover key={row.id} onClick={(e) => handleClickRow(e, row.id)}  >
+                    {Boolean(checkboxProps) && (
                         <TableCell padding="checkbox">
                             <Checkbox
                                 color="secondary"
-                                checked={selectedRows.includes(row.id) || false}
-                                onChange={() => onSelect(row.id)}
+                                checked={checkboxProps.selected.includes(row.id) || false}
+                                onChange={() => checkboxProps.onChange(row.id)}
                             />
                         </TableCell>
                     )}
 
-                    {columns.map(column => (
-                        <TableCell
-                            align={column.align}
-                            padding={column.disablePadding ? 'none' : 'default'}
-                            key={column.name}
-                            width={column.maxWidth}
-                        >
-                            {column.component ? column.component(row) : row[column.name]}
+                    {columns.map(({ name, label, component, ...rest }) => (
+                        <TableCell key={name} {...rest}>
+                            {component ? component(row) : row[name]}
                         </TableCell>
                     ))}
                 </TableRow>
@@ -41,15 +36,12 @@ const CustomTableBody = ({ columns, rows, selectedRows, checkbox, onSelect }) =>
 }
 
 CustomTableBody.propTypes = {
-    columns: PropTypes.array.isRequired,
-    rows: PropTypes.array.isRequired,
-    checkbox: PropTypes.bool,
-    selectedRows: PropTypes.array,
-    onSelect: PropTypes.func
-};
-
-CustomTableBody.defaultProps = {
-    onSelect: () => { }
+    columns: PropTypes.arrayOf(types.column).isRequired,
+    rows: PropTypes.arrayOf(types.row).isRequired,
+    checkboxProps: PropTypes.shape({
+        selected: PropTypes.arrayOf(PropTypes.number).isRequired,
+        onChange: PropTypes.func
+    }),
 };
 
 export default CustomTableBody;

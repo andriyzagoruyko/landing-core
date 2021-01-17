@@ -3,20 +3,17 @@
 namespace App\Models;
 
 use App\Models\Category;
-use App\Filters\QueryFilter;
 use Illuminate\Support\Carbon;
-use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\Support\ImageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+use App\Traits\ImageGallery;
+use App\Traits\HasFilter;
 
 class Product extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, ImageGallery, HasFilter;
 
     /**
      * Disable snake case attributes.
@@ -38,7 +35,7 @@ class Product extends Model implements HasMedia
         'sale', 
         'saleEnabled', 
         'saleExpires', 
-        'available'
+        'available',
     ];
 
     /**
@@ -51,8 +48,7 @@ class Product extends Model implements HasMedia
         'title', 
         'description', 
         'article', 
-        //'categories',
-        'categoriesIds',
+        'categories',
         'price', 
         'sale',
         'saleEnabled', 
@@ -67,7 +63,7 @@ class Product extends Model implements HasMedia
      * @var array
      */
     protected $appends = [
-        'categoriesIds', 'images', 'saleExpires'
+        'images', 'saleExpires'
     ];
 
     /**
@@ -79,15 +75,9 @@ class Product extends Model implements HasMedia
         'saleEnabled' => 'boolean',
     ];
 
-    /**
-     * Get categories ids.
-     *
-     * @return string
-     */
-    public function getCategoriesIdsAttribute()
-    {   
-        return $this->categories->pluck('id')->toArray();
-    }
+    /*protected $with = [
+        'categories'
+    ];*/
 
     /**
      * Get a sale expiration date.
@@ -103,57 +93,6 @@ class Product extends Model implements HasMedia
         }
 
         return Carbon::parse($saleExpires)->isoFormat('Y-MM-DDTHH:m');
-    }
-
-    /**
-     * Get a product images collection.
-     *
-     * @return array
-     */
-    public function getImagesAttribute() {
-        $medias = $this->getMedia('images');
-
-        $medias->each(function($media) use (&$result){
-            $image = ImageFactory::load($media->getPath('thumb'));
-
-            $result[] = [
-                'id' => $media->id,
-                'width' => $image->getWidth(),
-                'height' => $image->getHeight(),
-                'src' => $media->getUrl('thumb'),
-                'srcSet' => $media->getSrcset('thumb'),
-                'original' => $media->getUrl()
-            ];
-        });
-
-        return $result;
-    }
-
-    /**
-     * Apply the scope to filter by params.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \App\Filters\QueryFilter $filters
-     * @return Builder
-     */
-    public function scopeFilter(Builder $builder, QueryFilter $filters)
-    {
-        return $filters->apply($builder);
-    }
-
-    /**
-     * Add thumbnail conversion for product images collection
-     *
-     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Media $media
-     * @return void
-     */
-    public function registerMediaConversions(Media $media = null) : void
-    {
-        $this->addMediaConversion('thumb')
-            ->fit(Manipulations::FIT_FILL, 900, 500)
-            ->background('ffffff')
-            ->quality(80)
-            ->withResponsiveImages();
     }
 
     /**

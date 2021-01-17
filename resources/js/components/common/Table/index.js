@@ -4,13 +4,13 @@ import useStyles from './styles'
 import { Table, TableContainer } from '@material-ui/core';
 import Head from './Head';
 import Body from './Body';
+import * as types from './proptypes';
 
 const CustomTable = (props) => {
     const {
         columns,
         rows,
         checkbox,
-        emptyText,
         selected,
         onSelect,
         onSelectAll,
@@ -20,36 +20,36 @@ const CustomTable = (props) => {
     const classes = useStyles();
 
     return (
-        <TableContainer  >
+        <TableContainer>
             <Table size='medium' className={classes.table} {...restProps}>
                 <Head
                     columns={columns}
-                    checkbox={checkbox}
-                    checked={selected.length > 0}
-                    indeterminate={selected.length  > 0 && selected.length < rows.length}
-                    onSelectAll={onSelectAll}
+                    checkboxProps={{
+                        checked: selected.length > 0,
+                        indeterminate: selected.length > 0 && selected.length < rows.length,
+                        onChange: onSelectAll
+                    }}
                 />
-                <Body
-                    columns={columns}
-                    rows={rows}
-                    selectedRows={selected}
-                    checkbox={checkbox}
-                    onSelect={onSelect} />
+                <Body columns={columns} rows={rows} checkboxProps={{ selected, onChange: onSelect }} />
             </Table>
         </TableContainer>
     );
 }
 
 CustomTable.propTypes = {
+    selected: PropTypes.arrayOf(PropTypes.number),
+    columns: PropTypes.arrayOf(types.column).isRequired,
+    rows: PropTypes.arrayOf(types.row).isRequired,
     title: PropTypes.string,
-    columns: PropTypes.array.isRequired,
-    rows: PropTypes.array.isRequired,
     checkbox: PropTypes.bool,
-    onCheck: PropTypes.func,
+    onSelect: PropTypes.func,
+    onSelectAll: PropTypes.func,
 };
 
 CustomTable.defaultProps = {
     onSelect: () => { },
+    onSelectAll: () => { },
+    rows: []
 };
 
 export default React.memo(CustomTable);

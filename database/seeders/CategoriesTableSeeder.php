@@ -14,6 +14,29 @@ class CategoriesTableSeeder extends Seeder
      */
     public function run()
     {
-        Category::factory()->count(5)->create();
+        $parents = Category::factory()
+            ->count(3)
+            ->create();
+
+        $parents = Category::factory()
+            ->count(5)
+            ->create()
+            ->each(function($category) use ($parents) {
+                $parents->random()->appendNode($category);
+            });
+
+        $parents = Category::factory()
+            ->count(8)
+            ->create()
+            ->each(function($category) use ($parents) {
+                $parents->random()->appendNode($category);
+            });
+
+        Category::factory()
+            ->count(5)
+            ->create()
+            ->each(function($category) use ($parents) {
+                $parents->random()->appendNode($category);
+            });
     }
 }

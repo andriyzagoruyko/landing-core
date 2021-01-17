@@ -9,7 +9,7 @@ const Form = ({ children, ...rest }) => {
         <Paper component="form" className={classes.paper} {...rest}>
             {children}
         </Paper>
-    )
+    );
 }
 
 

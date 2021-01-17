@@ -2,15 +2,15 @@ import { parseQuery, stringifyQuery } from '~/helpers/query';
 import entity from '~s/ducks/entity/selectors';
 
 const isActive = (state, entityName) => (
-    state.pages[entityName].data.isActive
+    state.pages.data[entityName].isActive
 );
 
 const getViewType = (state, entityName) => (
-    state.pages[entityName].data.viewType
+    state.pages.data[entityName].viewType
 );
 
 const getSelected = (state, entityName) => (
-    state.pages[entityName].data.selected
+    state.pages.data[entityName].selected
 );
 
 const isSelected = (state, entityName, id) => (
@@ -18,15 +18,15 @@ const isSelected = (state, entityName, id) => (
 )
 
 const getSearchKeyword = (state, entityName) => (
-    state.pages[entityName].data.searchKeyword
+    state.pages.data[entityName].searchKeyword
 );
 
 const getFilters = (state, entityName) => (
-    state.pages[entityName].data.filters
+    state.pages.data[entityName].filters
 );
 
 const getLastQuery = (state, entityName) => (
-    state.pages[entityName].data.lastQuery
+    state.pages.data[entityName].lastQuery
 );
 
 const getCurrentQuery = (state) => (
@@ -34,14 +34,14 @@ const getCurrentQuery = (state) => (
 )
 
 const getProcessing = (state, entityName) => (
-    state.pages[entityName].data.processing
+    state.pages.data[entityName].processing
 )
 const isSearchActive = (state, entityName) => (
     getSearchKeyword(state, entityName).length > 0
 );
 
 const getStatus = (state, entityName, key) => (
-    state.pages[entityName].status[key]
+    state.pages.status[entityName][key]
 );
 
 const getStatusesdWithSameParams = (state, entityName, key) => {
@@ -49,7 +49,7 @@ const getStatusesdWithSameParams = (state, entityName, key) => {
     const statusParams = Object.keys(status.parsedParams);
     const result = {};
 
-    for (let key in state.pages[entityName].status) {
+    for (let key in state.pages.status[entityName]) {
         const current = getStatus(state, entityName, key);
         const currentParams = Object.keys(current.parsedParams);
 
@@ -58,7 +58,6 @@ const getStatusesdWithSameParams = (state, entityName, key) => {
             result[key] = { ...current };
         }
     }
-
 
     return result;
 }
@@ -157,6 +156,7 @@ export default {
     getSelected,
     isSelected,
     getSearchKeyword,
+    getLastQuery,
     getProcessing,
     isSearchActive,
     getFilters,
