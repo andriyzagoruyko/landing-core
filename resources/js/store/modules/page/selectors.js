@@ -1,5 +1,5 @@
 import { parseQuery, stringifyQuery } from '~/helpers/query';
-import entity from '~s/ducks/entity/selectors';
+import entity from '~s/modules/entity/selectors';
 
 const isActive = (state, entityName) => (
     state.pages.data[entityName].isActive
@@ -94,7 +94,6 @@ const getLimit = (state, entityName, key) => {
     }
 }
 
-
 const getActivePage = (state) => (
     Object.keys(state.pages).find(entityName => isActive(state, entityName))
 );
@@ -138,18 +137,6 @@ const getQueryAndParams = (state, entityName, restoreOnComeback = false, restore
     return { params, restoredQuery, savedQuery, currentQuery };
 }
 
-const getIitialFilters = (filterStructure, filterParams = {}) => {
-    let filters = {};
-
-    filterStructure.forEach(({ name, ...item }) => {
-        const active = Boolean(filterParams[name]);
-        const value = filterParams[name] ? filterParams[name] : [];
-        filters[name] = { ...item, name, active, value }
-    });
-
-    return filters;
-}
-
 export default {
     isActive,
     getViewType,
@@ -169,5 +156,4 @@ export default {
     getActivePage,
     getCurrentQuery,
     getQueryAndParams,
-    getIitialFilters,
 }

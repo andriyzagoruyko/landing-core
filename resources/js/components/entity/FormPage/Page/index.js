@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { compose } from 'redux';
 import { useDispatch } from 'react-redux';
 import { ucFirst } from '~/helpers/';
-import noties from '~s/ducks/notifier/actions';
+import {actions as noties} from '~s/modules/notifier/';
 import useTitle from '~/hooks/useTitle';
 import withWrite from '~/hocs/entity/crud/withWrite';
 import withRead from '~/hocs/entity/crud/withRead';

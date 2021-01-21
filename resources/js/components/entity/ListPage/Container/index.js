@@ -4,11 +4,11 @@ import { compose } from 'redux';
 import { plural } from '~/helpers';
 
 /* Actions */
-import actions from '~s/ducks/page/thunks';
+import actions from '~s/modules/page/thunks';
 
 /* Selectors */
-import selectors from '~s/ducks/page/selectors';
-import entitySelectors from '~s/ducks/entity/selectors';
+import selectors from '~s/modules/page/selectors';
+import entitySelectors from '~s/modules/entity/selectors';
 
 /* hocs */
 import withError from '~/hocs/entity/withError';

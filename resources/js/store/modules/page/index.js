@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { parseQuery } from '~/helpers/query'
-import { actions as entityActions } from '~s/ducks/entity/'
+import { actions as entityActions } from '~s/modules/entity/'
 import { entities } from '../entities';
 
 const commonReducerCreator = (paramName) => ({

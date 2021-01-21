@@ -4,7 +4,7 @@ import { compose } from 'redux';
 import { getRandomKey } from '~/helpers/';
 
 /* Actions */
-import actions from '~s/ducks/entity/thunks';
+import actions from '~s/modules/entity/thunks';
 
 const Container = (WrappedComponent) => (props) => {
     return <WrappedComponent {...props} />

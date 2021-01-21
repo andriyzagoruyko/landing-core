@@ -1,17 +1,13 @@
 import { schema } from 'normalizr';
 import { plural } from '~/helpers/';
 
-const category = new schema.Entity('category');
-
-category.define(
-    {
-        children: [category]
-    },
+const category = new schema.Entity(
+    'category',
+    {},
     {
         mergeStrategy: (entityA, entityB) => ({
             ...entityA,
             ...entityB,
-
             products: [...(entityA.products || []), ...(entityB.products || [])],
         })
     }
@@ -19,17 +15,29 @@ category.define(
 
 const product = new schema.Entity(
     'product',
+    {},
+    {
+        processStrategy: (value) => {
+            return {
+                ...value,
+                categories: value.categories.map(cat => ({
+                    ...cat, products: [...(cat.products || []), value.id]
+                }))
+            }
+        }
+    }
+);
+
+product.define(
     {
         categories: [category]
-    },
-    {
-        processStrategy: (value) => ({
-            ...value,
-            categories: value.categories.map(cat => ({
-                ...cat, products: [...(cat.products || []), value.id]
-            }))
-        })
     }
+);
+
+category.define(
+    {
+        children: [category]
+    },
 );
 
 export const entitySchema = {

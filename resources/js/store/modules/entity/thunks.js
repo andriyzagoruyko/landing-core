@@ -1,6 +1,6 @@
 import selectors from './selectors';
-import { actions } from '~s/ducks/entity/'
-import noties from '~s/ducks/notifier/actions';
+import { actions } from '~s/modules/entity/'
+import {actions as noties} from '~s/modules/notifier/';
 import * as api from '~s/api/entity/index';
 
 const withNotification = async (dispatch, { message, variant = 'info' }, operation) => {

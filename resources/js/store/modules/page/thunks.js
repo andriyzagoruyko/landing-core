@@ -4,11 +4,11 @@ import { plural } from '~/helpers/';
 
 /* Actions */
 import { actions } from './';
-import entityActions from '~s/ducks/entity/thunks';
+import entityActions from '~s/modules/entity/thunks';
 
 /* Selectors */
 import selectors from './selectors';
-import entitySelectors from '~s/ducks/entity/selectors';
+import entitySelectors from '~s/modules/entity/selectors';
 
 /* Helpers */
 import { getFiltersFromParams } from '~c/common/Filter/helpers';

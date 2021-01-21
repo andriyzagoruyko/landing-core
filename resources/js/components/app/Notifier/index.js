@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
-import { removeSnackbar } from '~s/ducks/notifier/actions';
+import { actions } from '~s/modules/notifier/';
 
 let displayed = [];
 
@@ -31,7 +31,7 @@ const Notifier = () => {
                     }
                 },
                 onExited: (event, myKey) => {
-                    dispatch(removeSnackbar(myKey));
+                    dispatch(actions.removeSnackbar(myKey));
                     removeDisplayed(myKey);
                 },
             });

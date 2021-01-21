@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { normalize } from 'normalizr';
-import { getEntitySchema } from '~s/ducks/schema';
+import { getEntitySchema } from '~s/modules/schema';
 import { entities } from '../entities';
 import merge from 'lodash/merge'
 
@@ -22,14 +22,30 @@ const entitiesSlice = (entities) => {
 
                     state.status[entityName][query] = { isFetching: false, error: null };
 
-                    if (type !== 'delete' && action.payload.data) {
-                        const { entities, result } = action.payload.data;
+                    if (action.payload.data) {
+                        switch (type) {
+                            case 'get': {
+                                const { entities, result } = action.payload.data;
 
-                        for (let name in entities) {
-                            state.data[name] = merge({}, state.data[name], entities[name]);
+                                state.status[entityName][query].result = result;
+
+                                for (let name in entities) {
+                                    state.data[name] = merge({}, state.data[name], entities[name]);
+                                }
+
+                                break;
+                            }
+
+                            case 'delete': { }
+
+                            default: {
+                                state.data[entityName] = {
+                                    ...state.data[entityName], ...action.payload.data
+                                }
+
+                                break;
+                            }
                         }
-
-                        state.status[entityName][query].result = result;
                     }
                 },
                 prepare: (entityName, request, result) => {

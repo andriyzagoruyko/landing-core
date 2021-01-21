@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 import { reducer as reduxFormReducer } from 'redux-form';
 import { connectRouter } from 'connected-react-router';
-import appReducer from '~s/ducks/app/reducers';
-import snackbarReducer from '~s/ducks/notifier/reducers';
 
-import { reducer as entities} from '~s/ducks/entity/'
-import { reducer as pages} from '~s/ducks/page/'
+import { reducer as snackbarReducer} from '~s/modules/notifier/';
+import { reducer as appReducer} from '~s/modules/app/';
+import { reducer as entities} from '~s/modules/entity/'
+import { reducer as pages} from '~s/modules/page/'
 
 const rootReducer = (history) => combineReducers({
     router: connectRouter(history),

@@ -4,7 +4,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { routerMiddleware } from 'connected-react-router'
 import thunk from 'redux-thunk';
 import logger from 'redux-logger'
-import rootReducer from '~s/ducks'
+import rootReducer from '~s/modules'
 
 export const history = createBrowserHistory({
     basename: '/admin/',

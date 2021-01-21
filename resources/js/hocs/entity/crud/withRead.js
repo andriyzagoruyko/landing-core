@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
 /* Actions */
-import actions from '~s/ducks/entity/thunks';
+import actions from '~s/modules/entity/thunks';
 
 /* Selectors */
-import selectors from '~s/ducks/entity/selectors';
+import selectors from '~s/modules/entity/selectors';
 
 const Container = (WrappedComponent) => ({ shouldRead, ...props }) => {
     const { query, readEntity } = props;

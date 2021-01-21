@@ -1,4 +1,4 @@
-import { getEntitySchema } from '~s/ducks/schema';
+import { getEntitySchema } from '~s/modules/schema';
 import { denormalize } from 'normalizr';
 
 const getEntitiesForDenormalization = state => (
