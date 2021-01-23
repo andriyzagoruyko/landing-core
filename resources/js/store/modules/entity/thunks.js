@@ -1,6 +1,6 @@
 import selectors from './selectors';
 import { actions } from '~s/modules/entity/'
-import {actions as noties} from '~s/modules/notifier/';
+import { actions as noties } from '~s/modules/notifier/';
 import * as api from '~s/api/entity/index';
 
 const withNotification = async (dispatch, { message, variant = 'info' }, operation) => {
@@ -37,7 +37,7 @@ const makeRequest = async (dispatch, entityName, request, notice = '') => {
     }
 }
 
-const readEntities = (entityName, query, isMultiple = false, notice = {}) => async dispatch => (
+const readEntities = (entityName, query, isMultiple = false, notice = {}) => dispatch => (
     makeRequest(dispatch, entityName, {
         query,
         isMultiple,
@@ -45,11 +45,11 @@ const readEntities = (entityName, query, isMultiple = false, notice = {}) => asy
     }, notice)
 );
 
-const removeEntities = (entityName, ids, notice = {}) => async (dispatch, getState) => (
+const removeEntities = (entityName, ids, notice = {}) => dispatch => (
     makeRequest(dispatch, entityName, {
-        type: 'remove',
-        isMultiple: ids.length > 1,
         query: ids,
+        isMultiple: ids.length > 1,
+        type: 'remove',
     }, notice)
 );
 
@@ -58,29 +58,13 @@ const createEntity = (entityName, key, data) => async dispatch => {
     dispatch(cleanEntitiesStatus(entityName));
 }
 
-const updateEntity = (entityName, id, data, notice) => async (dispatch, getState) => {
-
-    return makeRequest(dispatch, entityName, { query: id, data, type: 'update' }, notice);
-
-    /*
-    const state = getState();
-    const oldParent = selectors.getParent(state, entityName, id);
-    const newParent = data.parent_id;
-    if (newParent != oldParent) {
-        oldParent && dispatch(actions.detachChildren(entityName, oldParent, id));
-        newParent && dispatch(actions.attachChildren(entityName, newParent, id));
-
-        const statuses = { ...selectors.getAllStatuses(state, entityName) };
-
-        if (statuses.root && (!newParent || !oldParent)) {
-            statuses.root.result = !oldParent
-                ? statuses.root.result.filter(r => r !== id)
-                : statuses.root.result.concat([id]);
-
-
-            dispatch(actions.setStatus(entityName, statuses));
-        }
-    }*/
+const updateEntity = (entityName, id, data, notice) => dispatch => {
+    dispatch(actions.attach(entityName, id, data.parent_id));
+    return makeRequest(dispatch, entityName, {
+        query: id,
+        data,
+        type: 'update'
+    }, notice);
 }
 
 const updateOrCreateEntity = (entityName, data, key = '') => async dispatch => (
@@ -96,8 +80,6 @@ const cleanEntitiesStatus = (entityName, exceptKeys = [], updateKey) => async (d
     const newStatuses = Object.fromEntries(
         Object.entries(statuses).filter(([key]) => exceptKeys.includes(key))
     );
-
-    console.log('gggggggggggggggggggg', newStatuses[updateKey]);
 
     dispatch(actions.setStatuses(entityName, {
         ...newStatuses,

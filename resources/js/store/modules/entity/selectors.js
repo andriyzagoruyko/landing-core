@@ -1,4 +1,4 @@
-import { getEntitySchema } from '~s/modules/schema';
+import Model from '~s/modules/entity/Model';
 import { denormalize } from 'normalizr';
 
 const getEntitiesForDenormalization = state => (
@@ -16,7 +16,7 @@ const getEntity = (state, entityName, id) => {
     if (id) {
         return denormalize(
             state.entities.data[entityName][id],
-            getEntitySchema(entityName, true),
+            Model.getEntitySchema(entityName, true),
             getEntitiesForDenormalization(state),
         );
     }
@@ -25,7 +25,7 @@ const getEntity = (state, entityName, id) => {
 const getCollectionByArray = (state, entityName, array) => {
     const result = denormalize(
         array,
-        getEntitySchema(entityName, true),
+        Model.getEntitySchema(entityName, true),
         getEntitiesForDenormalization(state),
     );
 

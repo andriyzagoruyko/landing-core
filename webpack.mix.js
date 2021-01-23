@@ -13,7 +13,22 @@ const mix = require('laravel-mix');
 //sass('resources/sass/app.scss', 'public/css')
 
 mix.react('resources/js/main.js', 'public/js')
+    .babelConfig({
+        "presets": [
+            "@babel/preset-env",
+            "@babel/preset-react"
+        ],
+        "plugins": [
+            [
+                "@babel/plugin-proposal-class-properties",
+                {
+                    "loose": true
+                }
+            ]
+        ]
+    })
     .sourceMaps(false, 'eval-cheap-source-map')
+
     .webpackConfig({
         devServer: {
             contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'resources/devserver')],
@@ -34,6 +49,6 @@ mix.react('resources/js/main.js', 'public/js')
                 '~p': path.resolve(__dirname, 'resources/js/pages'),
                 '~s': path.resolve(__dirname, 'resources/js/store')
             }
-        }
+        },
     });
 
