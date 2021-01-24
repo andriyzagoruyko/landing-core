@@ -2,84 +2,96 @@ import { schema } from 'normalizr';
 import { plural } from '~/helpers/';
 
 class Model {
-    constructor({ name, struct }) {
+    constructor({ name, struct, relations }) {
         this.name = name;
         this.plural = plural(name);
-        this.relations = { belongsTo: [], hasMany: [] }
+        this.relations = [];
+        this.belongs = [];
+        this.hasRelations = false;
 
-        this.schema = new schema.Entity(name, {},
-            {
-                mergeStrategy: (entityA, entityB) => (
-                    this.mergeStrategy(entityA, entityB)
-                ),
-                processStrategy: (value) => (
-                    this.processStrategy(value)
-                )
+        this.schema = new schema.Entity(name, {}, {
+            mergeStrategy: (entityA, entityB) => this.merge(entityA, entityB),
+            processStrategy: (value) => this.process(value)
+        });
+
+        Object.entries(struct).forEach(([key, value]) => {
+            if (value === Model.self) {
+                struct[key] = this.schema;
+            } else if (value === Model.self.many) {
+                struct[key] = [this.schema];
             }
-        );
-
-        if (struct.children) {
-            struct.children = [this.schema];
-        }
+        })
 
         this.schema.define(struct);
+
+        if (relations) {
+            this.defineRelations(relations);
+        }
+    }
+
+    merge(entityA, entityB) {
+        let relations = {};
+
+        this.belongs.forEach(item => {
+            if (item.selfMany) {
+                relations[item.selfKey] = [
+                    ...(entityA[item.selfKey] || []),
+                    ...(entityB[item.selfKey] || [])
+                ]
+            }
+        });
+
+        return { ...entityA, ...entityB, ...relations }
+    }
+
+    process(value) {
+        let relations = {};
+
+        this.relations.forEach(({ many, key, selfKey, isTree }) => {
+            if (!isTree) {
+                if (many) {
+                    relations[key] = value[key].map(val => ({
+                        ...val, [selfKey]: [...(val[selfKey] || []), value.id]
+                    }))
+                } else {
+                    relations[key] = value.id;
+                }
+            }
+        });
+
+        return { ...value, ...relations }
     }
 
     addRelation(relation) {
-        this.relations[relation.type].push(relation)
+        if (!relation.model) {
+            relation.model = this;
+        }
+
+        this.relations.push(relation)
+        this.hasRelations = true;
     }
 
     defineRelations(relations) {
         relations.forEach(relation => {
             this.addRelation(relation);
 
-            if (relation.type === 'hasMany') {
-                relation.model.addRelation(Model.belongsTo(this.plural, this))
+            if (relation.model != this) {
+                relation.model.belongs.push(relation);
             }
         });
     }
 
-    getRelations(type = null) {
-        return type
-            ? this.relations[type]
-            : this.relations.filter(relation => relation.length);
+    getRelations() {
+        return this.relations
     }
 
-    mergeStrategy(entityA, entityB) {
-        let relations = {};
-
-        this.relations.hasMany.forEach(item => {
-            relations[item.key] = [
-                ...(entityA[item.key] || []),
-                ...(entityB[item.key] || [])
-            ]
-        });
-
-        return { ...entityA, ...entityB, ...relations }
-    }
-
-    processStrategy(value) {
-        let relations = {};
-
-        this.relations.belongsTo.forEach(item => {
-            relations[item.key] = value[item.key].map(val => ({
-                ...val, [this.plural]: [...(val[this.plural] || []), value.id]
-            }))
-        });
-
-        return { ...value, ...relations }
+    getRelationsKeys() {
+        return this.getRelations().map(relation => relation.key)
     }
 
     static entitySchema = {};
+
     static allModels = {};
-
-    static hasMany(key, model) {
-        return { key, type: 'hasMany', model }
-    }
-
-    static belongsTo(key, model) {
-        return { key, type: 'belongsTo', model }
-    }
 
     static getEntitySchema(entityName, isCollection = false) {
         return Model.entitySchema[plural(entityName, isCollection)]
@@ -101,6 +113,10 @@ class Model {
 
     static getEntityNames() {
         return Object.keys(Model.allModels);
+    }
+
+    static get self() {
+        return { many: 'many' }
     }
 }
 

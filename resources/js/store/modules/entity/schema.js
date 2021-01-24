@@ -3,8 +3,15 @@ import Model from './Model';
 const category = new Model({
     name: 'category',
     struct: {
-        children: true,
+        children: Model.self.many,
     },
+    relations: [{
+        isTree: true,
+        key: 'parent_id',
+        many: false,
+        selfKey: 'children',
+        selfMany: true,
+    }]
 });
 
 const product = new Model({
@@ -12,11 +19,14 @@ const product = new Model({
     struct: {
         categories: [category.schema],
     },
+    relations: [{
+        model: category,
+        key: 'categories',
+        many: true,
+        selfKey: 'products',
+        selfMany: true
+    }]
 });
-
-category.defineRelations([
-    Model.hasMany('products', product)
-]);
 
 export default [
     product,

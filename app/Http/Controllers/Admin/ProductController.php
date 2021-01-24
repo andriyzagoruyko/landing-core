@@ -12,7 +12,8 @@ class ProductController extends EntityController
 
     protected $load = [
         'media',  
-        'categories.media'
+        'categories.media',
+        'categories.children.media',
     ];
 
     protected $dataTypes = [

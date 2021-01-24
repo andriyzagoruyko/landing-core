@@ -40,16 +40,9 @@ const { actions, reducer } = createSlice({
                         }
 
                         default: {
-                            const model = Model.findModel(entityName);
-
-                            console.log(model.getRelations('hasMany'));
-
                             const { entities, result } = action.payload.data;
 
-                            state.data[entityName] = {
-                                ...state.data[entityName], ...entities[entityName]
-                            }
-
+                            state.data[entityName] = { ...state.data[entityName], ...entities[entityName] }
                             state.status[entityName][query].result = result;
 
                             break;
@@ -91,44 +84,63 @@ const { actions, reducer } = createSlice({
             },
             prepare: (entityName, statuses) => ({ meta: { entityName }, payload: statuses }),
         },
-        attach: {
+        updateRelations: {
             reducer: (state, action) => {
                 const { entityName } = action.meta;
-                const { id, newParent } = action.payload;
+                const { entityId, relations, data } = action.payload;
+                const entity = state.data[entityName][entityId];
 
-                const entity = state.data[entityName][id];
-                const oldParent = entity.parent_id;
-                const root = state.status[entityName].root;
+                relations.forEach(relation => {
+                    const { key, selfKey, model } = relation;
+                    const prev = entity[key], next = data[key];
 
-                if (oldParent != newParent) {
-                    //detach
-                    if (oldParent) {
-                        const parent = state.data[entityName][oldParent];
+                    //Update related
+                    if (selfKey) {
+                        const toDetach = relation.many
+                            ? prev.filter(id => !next.includes(id)) : prev !== next ? [prev] : []
 
-                        if (parent) {
-                            parent.children = parent.children.filter(childId => childId !== id);
-                        }
+                        const toAttach = relation.many
+                            ? next.filter(id => !prev.includes(id))
+                            : prev !== next ? [next].filter(i => Boolean(i)) : []
 
-                        entity.parent_id = null;
-                        
-                        root && root.result.push(id);
+                        toDetach.forEach(detach => {
+                            const related = state.data[model.name][detach];
+
+                            if (related) {
+                                related[selfKey] = relation.selfMany
+                                    ? related[selfKey].filter(id => id !== entityId) : null
+                            }
+                        });
+
+                        toAttach.forEach(attach => {
+                            const related = state.data[model.name][attach];
+
+                            related[selfKey] = relation.selfMany
+                                ? (related[selfKey] || []).concat([entityId]) : entityId
+                        });
                     }
 
-                    //attach
-                    if (newParent) {
-                        const parent = state.data[entityName][newParent];
+                    //Update status if it is entities tree
+                    if (!relation.many && relation.isTree && prev != next) {
+                        const root = state.status[entityName].root;
 
-                        if (parent) {
-                            entity.parent_id = newParent;
-                            parent.children.push(id);
-
-                            root && (root.result = root.result.filter(rId => rId !== id))
+                        if (root) {
+                            prev && root.result.push(entityId);
+                            next && (root.result = root.result.filter(rId => rId !== entityId))
                         }
                     }
-                }
+
+                    //Update entity
+                    entity[key] = next || null;
+                });
             },
-            prepare: (entityName, id, newParent = null) => ({ meta: { entityName }, payload: { id, newParent } }),
-        }
+            prepare: (entityName, entityId, data) => {
+                const model = Model.findModel(entityName);
+                const relations = model.getRelations();
+
+                return { meta: { entityName }, payload: { entityId, relations, data } }
+            },
+        },
     },
 });
 

@@ -7,7 +7,6 @@ import { reducer as appReducer} from '~s/modules/app/';
 import { reducer as entities} from '~s/modules/entity/'
 import { reducer as pages} from '~s/modules/page/'
 
-
 const rootReducer = (history) => combineReducers({
     router: connectRouter(history),
     form: reduxFormReducer,

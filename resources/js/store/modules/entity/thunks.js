@@ -59,7 +59,8 @@ const createEntity = (entityName, key, data) => async dispatch => {
 }
 
 const updateEntity = (entityName, id, data, notice) => dispatch => {
-    dispatch(actions.attach(entityName, id, data.parent_id));
+    dispatch(actions.updateRelations(entityName, id, data));
+
     return makeRequest(dispatch, entityName, {
         query: id,
         data,
