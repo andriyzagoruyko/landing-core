@@ -94,14 +94,14 @@ const { actions, reducer } = createSlice({
                     const { key, selfKey, model } = relation;
                     const prev = entity[key], next = data[key];
 
-                    //Update related
+                    //Update related entities
                     if (selfKey) {
                         const toDetach = relation.many
                             ? prev.filter(id => !next.includes(id)) : prev !== next ? [prev] : []
 
                         const toAttach = relation.many
                             ? next.filter(id => !prev.includes(id))
-                            : prev !== next ? [next].filter(i => Boolean(i)) : []
+                            : prev !== next ? [next].filter(Boolean) : []
 
                         toDetach.forEach(detach => {
                             const related = state.data[model.name][detach];
@@ -130,7 +130,7 @@ const { actions, reducer } = createSlice({
                         }
                     }
 
-                    //Update entity
+                    //Update entity relations
                     entity[key] = next || null;
                 });
             },

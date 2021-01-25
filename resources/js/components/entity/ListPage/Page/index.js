@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Paper, Tooltip, IconButton, Typography } from '@material-ui/core';
 import EmptyText from '~c/entity/ListPage/EmptyText'
@@ -36,14 +36,30 @@ const EntityListPage = (props) => {
         viewTypeItems
     } = props;
 
+    const handleMultipleSelect = useCallback(() => {
+        selectMultiple(entities.map(e => e.id));
+    }, [entities]);
+
+    const handleRemoveSelected = useCallback(() => {
+        removeEntitiesFromPage(selected)
+    }, [selected]);
+
+    const handleChangePage = useCallback((e, newPage) => {
+        changePage(newPage, limit)
+    }, [limit]);
+
+    const handleChangePerPage = useCallback((e) => {
+        changePage(1, parseInt(e.target.value, 10))
+    }, []);
+
     return (
         <>
             <Container component={Paper} style={{ padding: 0 }} maxWidth={false} >
                 <Toolbar
                     selectedProps={{
                         selectedCount: selected.length,
-                        onRemove: () => removeEntitiesFromPage(selected),
-                        onReset: () => selectMultiple([])
+                        onRemove: handleRemoveSelected,
+                        onReset: handleMultipleSelect
                     }}
                     searchProps={{
                         placeholder: searchPlaceholder || 'Search',
@@ -84,7 +100,7 @@ const EntityListPage = (props) => {
                             selected={selected}
                             entities={entities}
                             onSelect={selectEntity}
-                            onMultipleSelect={() => selectMultiple(entities.map(e => e.id))}
+                            onMultipleSelect={handleMultipleSelect}
                             baseRoute={baseRoute}
                             onRemove={removeEntitiesFromPage}
                         />
@@ -101,8 +117,8 @@ const EntityListPage = (props) => {
                     page={page}
                     perPage={limit}
                     perPageOptions={perPageOptions}
-                    onChangePage={(e, newPage) => changePage(newPage, limit)}
-                    onChangePerPage={(e) => changePage(1, parseInt(e.target.value, 10))}
+                    onChangePage={handleChangePage}
+                    onChangePerPage={handleChangePerPage}
                 />
             )}
         </>

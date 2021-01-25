@@ -7,7 +7,6 @@ class Model {
         this.plural = plural(name);
         this.relations = [];
         this.belongs = [];
-        this.hasRelations = false;
 
         this.schema = new schema.Entity(name, {}, {
             mergeStrategy: (entityA, entityB) => this.merge(entityA, entityB),
@@ -68,7 +67,6 @@ class Model {
         }
 
         this.relations.push(relation)
-        this.hasRelations = true;
     }
 
     defineRelations(relations) {
@@ -82,11 +80,15 @@ class Model {
     }
 
     getRelations() {
-        return this.relations
+        return this.relations;
     }
 
     getRelationsKeys() {
-        return this.getRelations().map(relation => relation.key)
+        return this.getRelations().map(relation => relation.key);
+    }
+
+    hasRelation() {
+        return this.getRelations().length > 0;
     }
 
     static entitySchema = {};

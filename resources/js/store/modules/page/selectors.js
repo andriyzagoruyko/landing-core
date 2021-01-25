@@ -1,48 +1,81 @@
 import { parseQuery, stringifyQuery } from '~/helpers/query';
 import entity from '~s/modules/entity/selectors';
+import { createSelector } from 'reselect'
 
-const isActive = (state, entityName) => (
-    state.pages.data[entityName].isActive
+const getPageData = (state, entityName) => (
+    state.pages.data[entityName]
 );
 
-const getViewType = (state, entityName) => (
-    state.pages.data[entityName].viewType
+const isActive = createSelector(
+    getPageData, data => data.isActive
 );
 
-const getSelected = (state, entityName) => (
-    state.pages.data[entityName].selected
+const getViewType = createSelector(
+    getPageData, data => data.viewType
 );
 
-const isSelected = (state, entityName, id) => (
-    getSelected(state, entityName).includes(id)
-)
-
-const getSearchKeyword = (state, entityName) => (
-    state.pages.data[entityName].searchKeyword
+const getSelected = createSelector(
+    getPageData, data => data.selected
 );
 
-const getFilters = (state, entityName) => (
-    state.pages.data[entityName].filters
+const isSelected = createSelector(
+    getPageData, data => data.selected.includes(id)
 );
 
-const getLastQuery = (state, entityName) => (
-    state.pages.data[entityName].lastQuery
+const getSearchKeyword = createSelector(
+    getPageData, data => data.searchKeyword
+);
+
+const isSearchActive = createSelector(
+    getSearchKeyword, keyword => keyword.length > 0
+);
+
+const getFilters = createSelector(
+    getPageData, data => data.filters
+);
+
+const getLastQuery = createSelector(
+    getPageData, data => data.lastQuery
+);
+
+const getProcessing = createSelector(
+    getPageData, data => data.processing
+);
+
+const getStatus = createSelector(
+    (state, entityName, key) => state.pages.status[entityName][key],
+    status => status
+);
+
+const getPage = createSelector(
+    getStatus,
+    status => status && status.parsedParams.page
+);
+
+const getMaxPages = createSelector(
+    getStatus,
+    status => status && status.maxPages
+);
+
+const getTotal = createSelector(
+    getStatus,
+    status => status && status.total
+);
+
+const getLimit = createSelector(
+    getStatus,
+    status => status && status.parsedParams.limit
+);
+
+const getActivePage = createSelector(
+    state => state.pages,
+    pages => pages.find(entityName => isActive(state, entityName))
 );
 
 const getCurrentQuery = (state) => (
     state.router.location.search.replace('?', '')
-)
-
-const getProcessing = (state, entityName) => (
-    state.pages.data[entityName].processing
-)
-const isSearchActive = (state, entityName) => (
-    getSearchKeyword(state, entityName).length > 0
 );
 
-const getStatus = (state, entityName, key) => (
-    state.pages.status[entityName][key]
-);
 
 const getStatusesdWithSameParams = (state, entityName, key) => {
     const status = getStatus(state, entityName, key);
@@ -61,42 +94,6 @@ const getStatusesdWithSameParams = (state, entityName, key) => {
 
     return result;
 }
-
-const getPage = (state, entityName, key) => {
-    const status = getStatus(state, entityName, key);
-
-    if (status) {
-        return status.parsedParams.page;
-    }
-}
-
-const getMaxPages = (state, entityName, key) => {
-    const status = getStatus(state, entityName, key);
-
-    if (status) {
-        return status.maxPages;
-    }
-}
-
-const getTotal = (state, entityName, key) => {
-    const status = getStatus(state, entityName, key);
-
-    if (status) {
-        return status.total;
-    }
-}
-
-const getLimit = (state, entityName, key) => {
-    const status = getStatus(state, entityName, key);
-
-    if (status) {
-        return status.parsedParams.limit;
-    }
-}
-
-const getActivePage = (state) => (
-    Object.keys(state.pages).find(entityName => isActive(state, entityName))
-);
 
 const getQueryAndParams = (state, entityName, restoreOnComeback = false, restoreAlways = [], initialParams = {}) => {
     const currentQuery = getCurrentQuery(state);
@@ -148,12 +145,12 @@ export default {
     isSearchActive,
     getFilters,
     getStatus,
-    getStatusesdWithSameParams,
     getPage,
     getMaxPages,
     getTotal,
     getLimit,
     getActivePage,
     getCurrentQuery,
+    getStatusesdWithSameParams,
     getQueryAndParams,
 }

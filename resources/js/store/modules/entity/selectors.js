@@ -1,66 +1,76 @@
 import Model from '~s/modules/entity/Model';
 import { denormalize } from 'normalizr';
+import { createSelector } from 'reselect'
 
-const getEntitiesForDenormalization = state => (
-    Object.keys(state.entities.data).reduce(
-        (result, key) => ({ ...result, [key]: state.entities.data[key] }),
-        {},
-    )
+const getEntitySchema = (state, entityName, isMultiple = true) => (
+    Model.getEntitySchema(entityName, isMultiple)
 );
 
-const getStatus = (state, entityName, key) => (
+const selectStatus = (state, entityName, key) => (
     state.entities.status[entityName][key] || {}
 );
 
-const getEntity = (state, entityName, id) => {
-    if (id) {
-        return denormalize(
-            state.entities.data[entityName][id],
-            Model.getEntitySchema(entityName, true),
-            getEntitiesForDenormalization(state),
-        );
-    }
-}
-
-const getCollectionByArray = (state, entityName, array) => {
-    const result = denormalize(
-        array,
-        Model.getEntitySchema(entityName, true),
-        getEntitiesForDenormalization(state),
-    );
-
-    return result.length ? result.filter(Boolean) : [];
-}
-
-const getCollection = (state, entityName, key) => {
-    let status = getStatus(state, entityName, key);
-
-    if (!status.result || !status.result.length) {
-        return [];
-    }
-
-    return getCollectionByArray(state, entityName, status.result);
-};
-
-const getCollectionCount = (state, entityName, key) => (
-    getCollection(state, entityName, key).length
-)
-
-const getParent = (state, entityName, id) => {
-    const entity = getEntity(state, entityName, id);
-    return entity.parent_id;
-}
-
 const getAllStatuses = (state, entityName) => (
     state.entities.status[entityName]
-)
+);
+
+const getDenormilizedEntities = createSelector(
+    (state) => state.entities,
+    entities => Object.keys(entities.data).reduce(
+        (result, key) => ({ ...result, [key]: entities.data[key] }),
+        {}
+    )
+);
+
+const getStatus = createSelector(
+    selectStatus,
+    status => status
+);
+
+const getCollectionByArray = createSelector(
+    getDenormilizedEntities,
+    getEntitySchema,
+    (state, entityName, array) => array,
+    (entities, schema, array) => {
+        const result = denormalize(array, schema, entities);
+        return result && result.length ? result.filter(Boolean) : [];
+    }
+);
+
+const getCollection = createSelector(
+    getStatus,
+    getDenormilizedEntities,
+    getEntitySchema,
+    (status, entities, schema) => {
+        if (!status.result || !status.result.length) {
+            return [];
+        }
+
+        return denormalize(status.result, schema, entities);
+    }
+);
+
+const getEntity = createSelector(
+    (state, entityName, id) => id && state.entities.data[entityName][id],
+    getDenormilizedEntities,
+    getEntitySchema,
+    (entity, denorm, schema) => {
+        if (entity) {
+            return denormalize(entity, schema, denorm);
+        }
+    }
+);
+
+const getCollectionCount = createSelector(
+    getCollection,
+    entities => entities.length
+);
 
 export default {
     getEntity,
     getCollectionByArray,
     getCollection,
     getCollectionCount,
-    getAllStatuses,
     getStatus,
-    getParent
+    getAllStatuses,
 }

@@ -54,7 +54,11 @@ const removeEntities = (entityName, ids, notice = {}) => dispatch => (
 );
 
 const createEntity = (entityName, key, data) => async dispatch => {
-    await makeRequest(dispatch, entityName, { key, data, type: 'create' }, notice);
+    await makeRequest(dispatch, entityName, {
+        key,
+        data,
+        type: 'create'
+    }, notice);
     dispatch(cleanEntitiesStatus(entityName));
 }
 
