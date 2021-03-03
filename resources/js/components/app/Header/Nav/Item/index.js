@@ -2,35 +2,53 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import { ListItemIcon, ListItem, ListItemText } from '@material-ui/core/';
+import {
+    ListItemIcon,
+    ListItem,
+    ListItemText,
+} from '@material-ui/core/';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
     icon: {
-        minWidth: theme.spacing(4)
+        minWidth: theme.spacing(4),
     },
     submenuItem: {
-        paddingLeft: theme.spacing(6)
+        paddingLeft: theme.spacing(6),
     },
 }));
 
-const NavItem = ({ to, primary, icon, exact, active, hasSubmenu, onClick, sumbenuChild }) => {
+const NavItem = ({
+    to,
+    primary,
+    icon,
+    exact,
+    active,
+    hasSubmenu,
+    onClick,
+    sumbenuChild,
+}) => {
     const classes = useStyles();
 
-    const renderLink = url => {
+    const renderLink = (url) => {
         return React.useMemo(
-            () => React.forwardRef((itemProps, ref) => <NavLink
-                activeStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.07)' }}
-                to={url}
-                ref={ref}
-                exact={exact}
-                aria-current='page'
-                {...itemProps}
-            />),
+            () =>
+                React.forwardRef((itemProps, ref) => (
+                    <NavLink
+                        activeStyle={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.07)',
+                        }}
+                        aria-current="page"
+                        to={url}
+                        ref={ref}
+                        exact={exact}
+                        {...itemProps}
+                    />
+                )),
             [url],
         );
-    }
+    };
 
     return (
         <ListItem
@@ -39,14 +57,16 @@ const NavItem = ({ to, primary, icon, exact, active, hasSubmenu, onClick, sumben
             onClick={onClick}
             className={sumbenuChild ? classes.submenuItem : null}
         >
-            {icon
-                ? <ListItemIcon className={classes.icon}>{icon}</ListItemIcon>
-                : null}
+            {icon ? (
+                <ListItemIcon className={classes.icon}>
+                    {icon}
+                </ListItemIcon>
+            ) : null}
             <ListItemText primary={primary} />
             {hasSubmenu && (active ? <ExpandLess /> : <ExpandMore />)}
         </ListItem>
     );
-}
+};
 
 NavItem.propTypes = {
     to: PropTypes.string,
@@ -59,7 +79,7 @@ NavItem.propTypes = {
 };
 
 NavItem.defaultProps = {
-    onClick: () => { },
-}
+    onClick: () => {},
+};
 
 export default NavItem;

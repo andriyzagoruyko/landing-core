@@ -27,7 +27,7 @@ mix.react('resources/js/main.js', 'public/js')
             ]
         ]
     })
-    .sourceMaps(false, 'eval-cheap-source-map')
+    .sourceMaps(false, 'source-map')
 
     .webpackConfig({
         devServer: {

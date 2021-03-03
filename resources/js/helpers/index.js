@@ -1,42 +1,44 @@
-export const getRandomKey = () => new Date().getTime() + Math.random();
+export const getRandomKey = () =>
+    Math.round(new Date().getTime() + Math.random());
 
-export const ucFirst = (str) => str ? str[0].toUpperCase() + str.slice(1) : '';
+export const ucFirst = (str) =>
+    str ? str[0].toUpperCase() + str.slice(1) : '';
 
 export function plural(word, amount = true) {
     if (amount === 1 || amount === false) {
-        return word
+        return word;
     }
 
     const plural = {
-        '(quiz)$': "$1zes",
-        '^(ox)$': "$1en",
-        '([m|l])ouse$': "$1ice",
-        '(matr|vert|ind)ix|ex$': "$1ices",
-        '(x|ch|ss|sh)$': "$1es",
-        '([^aeiouy]|qu)y$': "$1ies",
-        '(hive)$': "$1s",
-        '(?:([^f])fe|([lr])f)$': "$1$2ves",
-        '(shea|lea|loa|thie)f$': "$1ves",
-        'sis$': "ses",
-        '([ti])um$': "$1a",
-        '(tomat|potat|ech|her|vet)o$': "$1oes",
-        '(bu)s$': "$1ses",
-        '(alias)$': "$1es",
-        '(octop)us$': "$1i",
-        '(ax|test)is$': "$1es",
-        '(us)$': "$1es",
-        '([^s]+)$': "$1s"
-    }
+        '(quiz)$': '$1zes',
+        '^(ox)$': '$1en',
+        '([m|l])ouse$': '$1ice',
+        '(matr|vert|ind)ix|ex$': '$1ices',
+        '(x|ch|ss|sh)$': '$1es',
+        '([^aeiouy]|qu)y$': '$1ies',
+        '(hive)$': '$1s',
+        '(?:([^f])fe|([lr])f)$': '$1$2ves',
+        '(shea|lea|loa|thie)f$': '$1ves',
+        sis$: 'ses',
+        '([ti])um$': '$1a',
+        '(tomat|potat|ech|her|vet)o$': '$1oes',
+        '(bu)s$': '$1ses',
+        '(alias)$': '$1es',
+        '(octop)us$': '$1i',
+        '(ax|test)is$': '$1es',
+        '(us)$': '$1es',
+        '([^s]+)$': '$1s',
+    };
     const irregular = {
-        'move': 'moves',
-        'foot': 'feet',
-        'goose': 'geese',
-        'sex': 'sexes',
-        'child': 'children',
-        'man': 'men',
-        'tooth': 'teeth',
-        'person': 'people'
-    }
+        move: 'moves',
+        foot: 'feet',
+        goose: 'geese',
+        sex: 'sexes',
+        child: 'children',
+        man: 'men',
+        tooth: 'teeth',
+        person: 'people',
+    };
     const uncountable = [
         'sheep',
         'fish',
@@ -62,26 +64,26 @@ export function plural(word, amount = true) {
         'sugar',
         'tuna',
         'you',
-        'wood'
-    ]
+        'wood',
+    ];
     // save some time in the case that singular and plural are the same
     if (uncountable.indexOf(word.toLowerCase()) >= 0) {
-        return word
+        return word;
     }
     // check for irregular forms
     for (const w in irregular) {
-        const pattern = new RegExp(`${w}$`, 'i')
-        const replace = irregular[w]
+        const pattern = new RegExp(`${w}$`, 'i');
+        const replace = irregular[w];
         if (pattern.test(word)) {
-            return word.replace(pattern, replace)
+            return word.replace(pattern, replace);
         }
     }
     // check for matches using regular expressions
     for (const reg in plural) {
-        const pattern = new RegExp(reg, 'i')
+        const pattern = new RegExp(reg, 'i');
         if (pattern.test(word)) {
-            return word.replace(pattern, plural[reg])
+            return word.replace(pattern, plural[reg]);
         }
     }
-    return word
+    return word;
 }

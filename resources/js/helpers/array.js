@@ -1,4 +1,4 @@
-export function filterArrayByKeyword(treeNodes = [], keyword, childrenName = "children", searchField = 'title', except) {
+export function filterArrayByKeyword(treeNodes = [], keyword, childrenName = "children", searchField = 'title') {
     let result = [];
 
     for (let index = 0; index <= treeNodes.length - 1; index++) {

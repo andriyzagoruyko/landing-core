@@ -38,7 +38,7 @@ class ProductController extends EntityController
      */
     public function store(ProductRequest $request)
     {
-        $product = $this->updateOrCreate($request, $product);
+        $product = $this->updateOrCreate($request);
         $product->categories()->sync($request->categories ? $request->categories : []);
 
         return $this->responseWithLoad($product->fresh(), 201);

@@ -1,105 +1,59 @@
-import selectors from './selectors';
-import { actions } from '~s/modules/entity/'
-import { actions as noties } from '~s/modules/notifier/';
 import * as api from '~s/api/entity/index';
+import { actions } from '~s/modules/entity/';
 
-const withNotification = async (dispatch, { message, variant = 'info' }, operation) => {
+const makeRequest = async (dispatch, entityName, request) => {
     try {
-        await operation();
-
-        if (message) {
-            dispatch(noties.enqueueSnackbar({
-                message,
-                options: { variant },
-            }))
-        }
-    } catch (error) {
-        dispatch(noties.enqueueSnackbar({
-            message: error.message, options: { variant: 'error', },
-        }));
-
-        console.log(error);
-
-        throw (error);
-    }
-}
-
-const makeRequest = async (dispatch, entityName, request, notice = '') => {
-    try {
-        await withNotification(dispatch, notice, async () => {
-            dispatch(actions.apiRequest(entityName, request));
-            const result = await api.[request.type](entityName, request);
-            dispatch(actions.apiSuccess(entityName, request, result));
-        });
+        dispatch(actions.apiRequest(entityName, request));
+        const result = await api[request.type](entityName, request);
+        dispatch(actions.apiSuccess(entityName, request, result));
+        return result;
     } catch (error) {
         dispatch(actions.apiError(entityName, request, error));
         console.log(error);
     }
-}
+};
 
-const readEntities = (entityName, query, isMultiple = false, notice = {}) => dispatch => (
+const readEntities = (entityName, query, isMultiple = false) => (
+    dispatch,
+) =>
     makeRequest(dispatch, entityName, {
         query,
         isMultiple,
-        type: 'get'
-    }, notice)
-);
+        type: 'get',
+    });
 
-const removeEntities = (entityName, ids, notice = {}) => dispatch => (
+const removeEntities = (entityName, ids) => (dispatch) =>
     makeRequest(dispatch, entityName, {
         query: ids,
         isMultiple: ids.length > 1,
         type: 'remove',
-    }, notice)
-);
+    });
 
-const createEntity = (entityName, key, data) => async dispatch => {
-    await makeRequest(dispatch, entityName, {
+const createEntity = (entityName, key, data) => (dispatch) =>
+    makeRequest(dispatch, entityName, {
         key,
         data,
-        type: 'create'
-    }, notice);
-    dispatch(cleanEntitiesStatus(entityName));
-}
+        type: 'create',
+    });
 
-const updateEntity = (entityName, id, data, notice) => dispatch => {
-    dispatch(actions.updateRelations(entityName, id, data));
-
-    return makeRequest(dispatch, entityName, {
+const updateEntity = (entityName, id, data) => (dispatch) =>
+    makeRequest(dispatch, entityName, {
         query: id,
         data,
-        type: 'update'
-    }, notice);
-}
+        type: 'update',
+    });
 
-const updateOrCreateEntity = (entityName, data, key = '') => async dispatch => (
+const updateOrCreateEntity = (entityName, data, key = '') => (
+    dispatch,
+) =>
     data.id
         ? dispatch(updateEntity(entityName, data.id, data))
-        : dispatch(createEntity(entityName, key, data))
-);
+        : dispatch(createEntity(entityName, key, data));
 
-const cleanEntitiesStatus = (entityName, exceptKeys = [], updateKey) => async (dispatch, getState) => {
-    const state = getState();
-    const statuses = selectors.getAllStatuses(state, entityName);
-
-    const newStatuses = Object.fromEntries(
-        Object.entries(statuses).filter(([key]) => exceptKeys.includes(key))
-    );
-
-    dispatch(actions.setStatuses(entityName, {
-        ...newStatuses,
-        [updateKey]: {
-            ...newStatuses[updateKey],
-            shouldUpdate: true
-        }
-    }));
-}
-
-export default {
+export {
     createEntity,
     readEntities,
     updateEntity,
     updateOrCreateEntity,
     removeEntities,
-    cleanEntitiesStatus,
-}
+};

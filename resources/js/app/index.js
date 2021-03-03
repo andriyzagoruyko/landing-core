@@ -6,15 +6,16 @@ import { ConnectedRouter } from 'connected-react-router';
 import configureStore, { history } from '~s/';
 import { theme } from './theme';
 import App from './App';
-import { Button } from '@material-ui/core/'
+import { Button } from '@material-ui/core/';
 
 const store = configureStore();
 
 const AppContainer = () => {
     const notistackRef = React.createRef();
-    const onClickDismiss = key => {
+
+    const onClickDismiss = (key) => {
         notistackRef.current.closeSnackbar(key);
-    }
+    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -22,18 +23,22 @@ const AppContainer = () => {
                 <SnackbarProvider
                     ref={notistackRef}
                     action={(key) => (
-                        <Button variant="contained" size="small" onClick={() => onClickDismiss(key)}>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => onClickDismiss(key)}
+                        >
                             got it
                         </Button>
                     )}
                 >
-                    <ConnectedRouter history={history} >
+                    <ConnectedRouter history={history}>
                         <App />
                     </ConnectedRouter>
                 </SnackbarProvider>
             </Provider>
         </ThemeProvider>
     );
-}
+};
 
 export default AppContainer;

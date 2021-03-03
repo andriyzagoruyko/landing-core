@@ -1,6 +1,6 @@
 /* Containers */
 import EntityList from '~c/entity/ListPage/';
-import EntityForm from '~c/entity/FormPage/'
+import EntityForm from '~c/entity/FormPage/';
 
 /* Layouts */
 import ListLayout from './List';
@@ -10,22 +10,15 @@ import FormLayout from './Form';
 import filterStructure from './filters';
 import validate from './validation';
 
-const form = { container: EntityForm, component: FormLayout, validate }
+export const CategoriesList = EntityList({
+    entityName: 'category',
+    searchPlaceholder: 'Search by name',
+    component: ListLayout,
+    filterStructure,
+});
 
-const settings = {
-    entityName: "category",
-    pages: [
-        {
-            searchPlaceholder: "Search by name",
-            availableViews: [],
-            defaultViewType: 'table',
-            container: EntityList,
-            component: ListLayout,
-            filterStructure,
-        },
-        { type: 'add', ...form },
-        { type: 'edit', route: '/:id(\\d+)', ...form }
-    ]
-}
-
-export default settings;
+export const CategoriesForm = EntityForm({
+    entityName: 'category',
+    component: FormLayout,
+    validate,
+});

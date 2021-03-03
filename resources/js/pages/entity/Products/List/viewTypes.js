@@ -2,7 +2,7 @@
 import ViewListIcon from '@material-ui/icons/ViewList';
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
 
-const viewTypeItems = [
+const viewTypes = [
     {
         name: 'table',
         title: 'Table view',
@@ -15,4 +15,4 @@ const viewTypeItems = [
     }
 ];
 
-export default viewTypeItems;
+export default viewTypes;

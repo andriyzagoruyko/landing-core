@@ -1,4 +1,4 @@
-const table = (renderAviability, renderActionButtons) => [
+const table = (renderAvailability, renderActionButtons) => [
     {
         name: 'id',
         label: 'ID',
@@ -18,7 +18,7 @@ const table = (renderAviability, renderActionButtons) => [
     {
         name: 'available',
         label: 'Availability',
-        component: (product) => renderAviability(product.available),
+        component: (product) => renderAvailability(product.available),
     },
     {
         name: 'price',

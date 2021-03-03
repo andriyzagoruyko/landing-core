@@ -1,33 +1,70 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Card, CardActions, CardContent, Typography, Checkbox, FormControlLabel } from '@material-ui/core/';
-import Aviability from '../Aviability'
+import {
+    Grid,
+    Card,
+    CardActions,
+    CardContent,
+    Typography,
+    Checkbox,
+    FormControlLabel,
+} from '@material-ui/core/';
+import Availability from '../Availability';
 import useStyles from './styles';
 import ProgresiveImage from '~c/common/ProgresiveImage';
 
-const ProductCard = ({ id, checked, title, article, available, description, price, images, onSelect, renderActionButtons }) => {
+const ProductCard = ({
+    id,
+    checked,
+    title,
+    article,
+    available,
+    description,
+    price,
+    images,
+    onSelect,
+    renderActionButtons,
+}) => {
     const classes = useStyles();
 
     return (
-        <Grid item xs={12} sm={6} md={4} lg={3} >
+        <Grid item xs={12} sm={6} md={4} lg={3}>
             <Card className={classes.card} variant="outlined">
-                <CardContent >
+                <CardContent>
                     <div>
                         <FormControlLabel
                             label={title}
                             className={classes.cardTitle}
                             control={
-                                <Checkbox checked={checked} onChange={onSelect} color="secondary" />
+                                <Checkbox
+                                    checked={checked}
+                                    onChange={onSelect}
+                                    color="secondary"
+                                />
                             }
                         />
                     </div>
-                    <Typography variant="body2" color="textSecondary" component="p">
+                    <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        component="p"
+                    >
                         <b>${price}</b> Article: {article}
                     </Typography>
                 </CardContent>
-                {images != null && (<ProgresiveImage alt={title} title={title} {...images[0]} />)}
+                {images != null && (
+                    <ProgresiveImage
+                        alt={title}
+                        title={title}
+                        {...images[0]}
+                    />
+                )}
                 <CardContent className={classes.cardContent}>
-                    <Aviability size="small" variant="default" available={available} />
+                    <Availability
+                        size="small"
+                        variant="default"
+                        available={available}
+                    />
                     <Typography
                         variant="body2"
                         color="textSecondary"
@@ -37,11 +74,13 @@ const ProductCard = ({ id, checked, title, article, available, description, pric
                         {description}
                     </Typography>
                 </CardContent>
-                <CardActions className={classes.cardActions}> {renderActionButtons(id)} </CardActions>
+                <CardActions className={classes.cardActions}>
+                    {renderActionButtons(id)}
+                </CardActions>
             </Card>
         </Grid>
     );
-}
+};
 
 ProductCard.propTypes = {
     checked: PropTypes.bool,
@@ -55,7 +94,7 @@ ProductCard.propTypes = {
 };
 
 ProductCard.defaultProps = {
-    onSelect: () => { },
+    onSelect: () => {},
 };
 
-export default React.memo(ProductCard);
+export default ProductCard;

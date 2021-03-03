@@ -2,33 +2,33 @@ import Model from './Model';
 
 const category = new Model({
     name: 'category',
-    struct: {
+    schema: {
         children: Model.self.many,
     },
-    relations: [{
-        isTree: true,
-        key: 'parent_id',
-        many: false,
-        selfKey: 'children',
-        selfMany: true,
-    }]
+    relations: {
+        parent_id: {
+            isTree: true,
+            selfKey: 'children',
+            selfMany: true,
+        },
+    },
 });
 
 const product = new Model({
     name: 'product',
-    struct: {
+    schema: {
         categories: [category.schema],
     },
-    relations: [{
-        model: category,
-        key: 'categories',
-        many: true,
-        selfKey: 'products',
-        selfMany: true
-    }]
+    relations: {
+        categories: {
+            model: category,
+            many: true,
+            selfKey: 'products',
+            selfMany: true,
+        },
+    },
 });
 
-export default [
-    product,
-    category
-];
+const entityNames = Model.registerModels([product, category]);
+
+export default entityNames;

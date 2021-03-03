@@ -7,11 +7,11 @@ const appendImages = (formData, images, isUpdate) => {
             isUpdate && formData.append('updateMedia[]', file.name);
         }
     });
-}
+};
 
 export const getFormData = (data) => {
     const formData = new FormData();
-    const isUpdate = Boolean(data.id)
+    const isUpdate = Boolean(data.id);
 
     isUpdate && formData.append('_method', 'PATCH');
 
@@ -22,9 +22,12 @@ export const getFormData = (data) => {
 
         if (Array.isArray(data[item])) {
             if (item === 'images') {
-                data[item] && appendImages(formData, data[item], isUpdate);
+                data[item] &&
+                    appendImages(formData, data[item], isUpdate);
             } else {
-                data[item].forEach(i => formData.append(`${item}[]`, i));
+                data[item].forEach((i) =>
+                    formData.append(`${item}[]`, i),
+                );
                 continue;
             }
         }
@@ -33,4 +36,4 @@ export const getFormData = (data) => {
     }
 
     return formData;
-}
+};

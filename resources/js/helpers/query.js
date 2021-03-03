@@ -12,11 +12,7 @@ export const parseQuery = (locationSearch) => {
 }
 
 export const stringifyQuery = (params, config = {}) => {
-    const stringifyConfig = {
-        ...queryStringConfig,
-        ...config
-    }
-    
+    const stringifyConfig = { ...queryStringConfig, ...config }
     return queryString.stringify({ ...params }, stringifyConfig);
 }
 
